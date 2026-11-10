@@ -5,10 +5,27 @@
   "buildCommand": null,
   "outputDirectory": "Educar para tranformar/src",
   "redirects": [
-    { "source": "/", "destination": "/html/index.html", "permanent": false },
-    { "source": "/Backend/:path*", "destination": "/html/index.html", "permanent": false }
+    {
+      "source": "/",
+      "destination": "/html/index.html",
+      "permanent": false
+    },
+    {
+      "source": "/Backend/:path*",
+      "destination": "/html/index.html",
+      "permanent": false
+    }
   ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/api"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/diario",
+      "schedule": "0 12 * * *"
+    }
   ]
 }

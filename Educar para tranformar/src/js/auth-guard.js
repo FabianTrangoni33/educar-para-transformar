@@ -15,7 +15,7 @@
 
   if (!esPaginaPublica && !usuarioLocal) {
     // Si intenta entrar al área admin sin sesión, redirigir al login admin
-    if (rutaActual.includes('dashboard') || rutaActual.includes('admin') || rutaActual.includes('asignacion')) {
+    if (rutaActual.includes('dashboard') || rutaActual.includes('admin') || rutaActual.includes('asignacion') || rutaActual.includes('pagos') || rutaActual.includes('reportes')) {
       window.location.href = 'login-admin.html';
     } else {
       window.location.href = 'login.html';

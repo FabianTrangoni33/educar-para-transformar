@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../js/api-config.js"></script>
+    <title>Reportes | NovaSYS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+    <link rel="icon" href="../img/logo.png" type="image/png">
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <style>@media print { aside, nav, #panelFiltros { display: none !important; } main { width: 100% !important; } }</style>
+</head>
+<body class="bg-light pt-0 m-0">
+
+<div class="container-fluid p-0">
+    <div class="row g-0">
+        <aside class="col-md-2 d-none d-md-block sidebar p-0 vh-100 position-sticky top-0">
+            <div class="p-4 text-center">
+                <img src="../img/logo.png" width="50" class="mb-2 bg-white rounded-circle p-1" alt="Logo NovaSYS">
+                <h5 class="text-white mb-0">NovaSYS</h5>
+                <small class="text-white-50">Gestión Institucional</small>
+            </div>
+            <ul class="nav flex-column mt-3">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><span class="material-symbols-outlined me-2">analytics</span> Vista General</a></li>
+                <li class="nav-item"><a class="nav-link" href="admin-usuarios.html"><span class="material-symbols-outlined me-2">manage_accounts</span> Gestión Usuarios</a></li>
+                <li class="nav-item"><a class="nav-link" href="control-alumnos.html"><span class="material-symbols-outlined me-2">group</span> Control Alumnos</a></li>
+                <li class="nav-item"><a class="nav-link" href="legajos-docentes.html"><span class="material-symbols-outlined me-2">badge</span> Legajos Docentes</a></li>
+                <li class="nav-item"><a class="nav-link" href="asignacion-docentes.html"><span class="material-symbols-outlined me-2">menu_book</span> Asignación Materias</a></li>
+                <li class="nav-item"><a class="nav-link" href="pagos.html"><span class="material-symbols-outlined me-2">payments</span> Cuotas y Pagos</a></li>
+                <li class="nav-item"><a class="nav-link active" href="reportes.html"><span class="material-symbols-outlined me-2">summarize</span> Reportes</a></li>
+                <li class="nav-item mt-3 border-top border-white border-opacity-10 pt-3">
+                    <a class="nav-link" href="index.html"><span class="material-symbols-outlined me-2">public</span> Ver Sitio Web</a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="col-md-10 main-content p-0">
+            <nav class="navbar-dashboard bg-white shadow-sm px-4 py-3 d-flex justify-content-between align-items-center">
+                <a href="dashboard.html" class="d-md-none btn btn-sm btn-outline-secondary rounded-pill">← Panel</a>
+                <span class="fw-bold text-dark">Reportes de la Dirección</span>
+                <button onclick="window.cerrarSesion()" class="btn btn-outline-danger btn-sm rounded-pill fw-bold">Cerrar Sesión</button>
+            </nav>
+
+            <div class="p-4 p-md-5">
+                <header class="mb-4">
+                    <h1 class="h3 fw-bold mb-1" id="tituloReporte">Reportes</h1>
+                    <p class="text-muted mb-0">Información académica, deportes, transporte y comedor. Los reportes de pagos están en <a href="pagos.html">Cuotas y Pagos</a>.</p>
+                </header>
+
+                <div class="bg-white rounded-4 shadow-sm p-3 mb-3" id="panelFiltros">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label small mb-1" for="tipo">Reporte</label>
+                            <select id="tipo" class="form-select form-select-sm">
+                                <option value="alumno">Ficha de un alumno</option>
+                                <option value="docente">Ficha de un docente (cursos y horarios)</option>
+                                <option value="curso">Alumnos por curso</option>
+                                <option value="materia">Alumnos por materia</option>
+                                <option value="nivel">Docentes por nivel</option>
+                                <option value="deporte">Alumnos por deporte (nivel, horario y profesor)</option>
+                                <option value="recorrido">Alumnos por recorrido de transporte</option>
+                                <option value="comedor">Alumnos inscriptos al comedor</option>
+                                <option value="auditoria">Auditoría de operaciones (web / app)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 filtro" data-para="alumno"><label class="form-label small mb-1" for="fAlumno">Alumno</label><select id="fAlumno" class="form-select form-select-sm"></select></div>
+                        <div class="col-md-3 filtro" data-para="docente"><label class="form-label small mb-1" for="fDocente">Docente</label><select id="fDocente" class="form-select form-select-sm"></select></div>
+                        <div class="col-md-3 filtro" data-para="curso"><label class="form-label small mb-1" for="fCurso">Curso</label><select id="fCurso" class="form-select form-select-sm"></select></div>
+                        <div class="col-md-3 filtro" data-para="materia"><label class="form-label small mb-1" for="fMateria">Materia</label><select id="fMateria" class="form-select form-select-sm"></select></div>
+                        <div class="col-md-3 filtro" data-para="deporte"><label class="form-label small mb-1" for="fDeporte">Deporte</label><select id="fDeporte" class="form-select form-select-sm"></select></div>
+                        <div class="col-md-2 filtro" data-para="nivel deporte"><label class="form-label small mb-1" for="fNivel">Nivel</label><select id="fNivel" class="form-select form-select-sm"></select></div>
+                        <div class="col-md-2 filtro" data-para="recorrido"><label class="form-label small mb-1" for="fRecorrido">Recorrido</label>
+                            <select id="fRecorrido" class="form-select form-select-sm"><option value="">Todos</option><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <button class="btn btn-sm btn-primary" id="btnVer">Ver reporte</button>
+                        <button class="btn btn-sm btn-outline-secondary" id="btnCsv" disabled>Exportar CSV</button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">Imprimir</button>
+                    </div>
+                </div>
+                <div id="resultado"></div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="../js/panel-admin.js"></script>
+<script>
+(function () {
+    const P = window.Panel, $ = (id) => document.getElementById(id);
+    let ultimo = null;
+
+    function ajustar() {
+        const t = $('tipo').value;
+        document.querySelectorAll('.filtro').forEach((f) => f.classList.toggle('d-none', !f.dataset.para.split(' ').includes(t)));
+    }
+    $('tipo').addEventListener('change', ajustar);
+    ajustar();
+
+    Promise.all([P.api('/alumnos'), P.api('/docentes'), P.api('/cursos'), P.api('/materias'), P.api('/deportes'), P.api('/niveles')])
+        .then(([alumnos, docentes, cursos, materias, deportes, niveles]) => {
+            const unicos = (lista, clave) => lista.filter((x, i, arr) => arr.findIndex((y) => y[clave] === x[clave]) === i);
+            P.llenarSelect($('fAlumno'), unicos(alumnos, 'id_alumno'), 'id_alumno', (a) => `${a.apellido}, ${a.nombre} (${a.legajo || '-'})`);
+            P.llenarSelect($('fDocente'), docentes, 'id', (d) => `${d.apellido}, ${d.nombre}`);
+            P.llenarSelect($('fCurso'), cursos, 'id_curso', (c) => `${c.nivel} - ${c.nombre}${c.division ? ' ' + c.division : ''}`, 'Todos');
+            P.llenarSelect($('fMateria'), unicos(materias, 'id'), 'id', (m) => `${m.nombre} (${m.nivel || '-'})`, 'Todas');
+            P.llenarSelect($('fDeporte'), deportes, 'id_deporte', (d) => `${d.nombre} (${d.nivel_nombre || ''})`, 'Todos');
+            P.llenarSelect($('fNivel'), niveles, 'id_nivel', (n) => n.nombre, 'Todos');
+        })
+        .catch((e) => { $('resultado').textContent = 'No se pudieron cargar los filtros: ' + e.message; });
+
+    const horariosTexto = (hs) => (hs || []).map((h) => `${h.dia} ${h.inicio}-${h.fin}`).join(' · ');
+
+    /** Ficha con varias secciones (alumno o docente). */
+    function ficha(titulo, datos, secciones) {
+        const r = $('resultado');
+        r.innerHTML = '';
+        const card = P.el('div', 'bg-white rounded-4 shadow-sm p-3 mb-3');
+        card.appendChild(P.el('h2', 'h5 fw-bold', titulo));
+        datos.forEach(([k, v]) => { const p = P.el('p', 'mb-1'); p.appendChild(P.el('strong', '', k + ': ')); p.appendChild(document.createTextNode(v || '-')); card.appendChild(p); });
+        r.appendChild(card);
+        secciones.forEach((s) => {
+            r.appendChild(P.el('h3', 'h6 fw-bold mt-3', s.titulo));
+            const cont = P.el('div');
+            r.appendChild(cont);
+            P.tabla(cont, s.columnas, s.filas, s.vacio);
+        });
+    }
+
+    const REPORTES = {
+        curso: { ruta: () => '/reportes/alumnos-por-curso' + q({ id_curso: $('fCurso').value }), columnas: [
+            { titulo: 'Nivel', campo: 'nivel' }, { titulo: 'Curso', valor: (f) => f.curso + (f.division ? ' ' + f.division : '') },
+            { titulo: 'Legajo', campo: 'legajo' }, { titulo: 'Apellido', campo: 'apellido' }, { titulo: 'Nombre', campo: 'nombre' }] },
+        materia: { ruta: () => '/reportes/alumnos-por-materia' + q({ id_materia: $('fMateria').value }), columnas: [
+            { titulo: 'Materia', campo: 'materia' }, { titulo: 'Nivel', campo: 'nivel' }, { titulo: 'Curso', campo: 'curso' },
+            { titulo: 'Profesor a cargo', campo: 'profesor' }, { titulo: 'Alumno', campo: 'alumno' }, { titulo: 'Legajo', campo: 'legajo' }] },
+        nivel: { ruta: () => '/reportes/docentes-por-nivel' + q({ id_nivel: $('fNivel').value }), columnas: [
+            { titulo: 'Nivel', campo: 'nivel' }, { titulo: 'Profesor', campo: 'profesor' }, { titulo: 'Materias a cargo', campo: 'materias' }, { titulo: 'Cursos', campo: 'cursos' }] },
+        deporte: { ruta: () => '/reportes/alumnos-por-deporte' + q({ id_deporte: $('fDeporte').value, id_nivel: $('fNivel').value }), columnas: [
+            { titulo: 'Deporte', campo: 'deporte' }, { titulo: 'Nivel del deporte', campo: 'nivel_deporte' }, { titulo: 'Día', campo: 'dia_semana' },
+            { titulo: 'Horario', campo: 'horario' }, { titulo: 'Profesor', campo: 'profesor' }, { titulo: 'Alumno', campo: 'alumno' },
+            { titulo: 'Legajo', campo: 'legajo' }, { titulo: 'Curso', campo: 'curso' }, { titulo: 'Nivel', campo: 'nivel' }] },
+        recorrido: { ruta: () => '/reportes/alumnos-por-recorrido' + q({ recorrido: $('fRecorrido').value }), columnas: [
+            { titulo: 'Recorrido', valor: (f) => `${f.recorrido} - ${f.recorrido_nombre || ''}` }, { titulo: 'Parada', campo: 'parada' },
+            { titulo: 'Alumno', campo: 'alumno' }, { titulo: 'Legajo', campo: 'legajo' }, { titulo: 'Curso', campo: 'curso' }, { titulo: 'Nivel', campo: 'nivel' }] },
+        comedor: { ruta: () => '/reportes/comedor', columnas: [
+            { titulo: 'Nivel', campo: 'nivel' }, { titulo: 'Curso', campo: 'curso' }, { titulo: 'Alumno', campo: 'alumno' },
+            { titulo: 'Legajo', campo: 'legajo' }, { titulo: 'Modalidad', campo: 'modalidad' }, { titulo: 'Inscripción', valor: (f) => P.fecha(f.fecha_inscripcion) }] },
+        auditoria: { ruta: () => '/reportes/auditoria', columnas: [
+            { titulo: 'Fecha', valor: (f) => P.fechaHora(f.creado_en) }, { titulo: 'Usuario', campo: 'email' }, { titulo: 'Acción', campo: 'accion' },
+            { titulo: 'Origen', campo: 'origen' }, { titulo: 'Detalle', valor: (f) => (f.detalle ? JSON.stringify(f.detalle) : '') }] }
+    };
+    function q(obj) {
+        const p = new URLSearchParams();
+        Object.entries(obj).forEach(([k, v]) => { if (v) p.set(k, v); });
+        const s = p.toString();
+        return s ? '?' + s : '';
+    }
+
+    $('btnVer').addEventListener('click', () => {
+        const t = $('tipo').value;
+        $('tituloReporte').textContent = $('tipo').selectedOptions[0].textContent;
+        $('resultado').textContent = 'Cargando...';
+        $('btnCsv').disabled = true;
+        ultimo = null;
+
+        if (t === 'alumno') {
+            if (!$('fAlumno').value) return ($('resultado').textContent = 'Elegí un alumno.');
+            return P.api('/reportes/alumno/' + $('fAlumno').value).then((d) => {
+                const a = d.alumno;
+                ficha(`${a.apellido}, ${a.nombre}`, [
+                    ['Legajo', a.legajo], ['DNI', a.dni], ['Nivel', a.nivel], ['Curso', (a.curso || '') + (a.division ? ' ' + a.division : '')], ['Estado', a.estado],
+                    ['Transporte', d.transporte ? `Recorrido ${d.transporte.recorrido_numero} (${d.transporte.nombre || ''}) - parada ${d.transporte.parada || '-'}` : 'No usa'],
+                    ['Comedor', d.comedor ? `Sí (${d.comedor.modalidad || 'inscripto'})` : 'No']
+                ], [
+                    { titulo: 'Materias y profesores', filas: d.materias, columnas: [{ titulo: 'Materia', campo: 'materia' }, { titulo: 'Profesor', campo: 'profesor' }] },
+                    { titulo: 'Deportes', filas: d.deportes, vacio: 'No está inscripto en deportes.', columnas: [
+                        { titulo: 'Deporte', campo: 'deporte' }, { titulo: 'Día', campo: 'dia_semana' }, { titulo: 'Horario', valor: (f) => `${f.inicio}-${f.fin}` }, { titulo: 'Profesor', campo: 'profesor' }] }
+                ]);
+            }).catch((e) => { $('resultado').textContent = e.message; });
+        }
+        if (t === 'docente') {
+            if (!$('fDocente').value) return ($('resultado').textContent = 'Elegí un docente.');
+            return P.api('/reportes/docente/' + $('fDocente').value).then((d) => {
+                const p = d.docente;
+                ficha(`${p.apellido}, ${p.nombre}`, [['Legajo', p.legajo], ['Especialidad', p.especialidad]], [
+                    { titulo: 'Cursos a cargo y horarios', filas: d.cursos, vacio: 'Sin cursos asignados.', columnas: [
+                        { titulo: 'Nivel', campo: 'nivel' }, { titulo: 'Curso', valor: (f) => (f.curso || '') + (f.division ? ' ' + f.division : '') },
+                        { titulo: 'Materia', campo: 'materia' }, { titulo: 'Horarios', valor: (f) => horariosTexto(f.horarios) }] }
+                ]);
+            }).catch((e) => { $('resultado').textContent = e.message; });
+        }
+
+        const rep = REPORTES[t];
+        P.api(rep.ruta()).then((filas) => {
+            ultimo = { nombre: 'reporte-' + t, columnas: rep.columnas, filas };
+            $('btnCsv').disabled = !filas.length;
+            const r = $('resultado');
+            r.innerHTML = '';
+            r.appendChild(P.el('p', 'fw-bold', `${filas.length} registro(s)`));
+            const cont = P.el('div');
+            r.appendChild(cont);
+            P.tabla(cont, rep.columnas, filas, 'Sin datos para los filtros elegidos.');
+        }).catch((e) => { $('resultado').textContent = e.message; });
+    });
+    $('btnCsv').addEventListener('click', () => ultimo && P.exportarCSV(ultimo.nombre, ultimo.columnas, ultimo.filas));
+})();
+</script>
+<script type="module" src="../js/auth-guard.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

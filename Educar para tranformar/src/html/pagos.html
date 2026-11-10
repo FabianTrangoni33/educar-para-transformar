@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../js/api-config.js"></script>
+    <title>Cuotas y Pagos | NovaSYS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+    <link rel="icon" href="../img/logo.png" type="image/png">
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body class="bg-light pt-0 m-0">
+
+<div class="container-fluid p-0">
+    <div class="row g-0">
+        <aside class="col-md-2 d-none d-md-block sidebar p-0 vh-100 position-sticky top-0">
+            <div class="p-4 text-center">
+                <img src="../img/logo.png" width="50" class="mb-2 bg-white rounded-circle p-1" alt="Logo NovaSYS">
+                <h5 class="text-white mb-0">NovaSYS</h5>
+                <small class="text-white-50">Gestión Institucional</small>
+            </div>
+            <ul class="nav flex-column mt-3">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><span class="material-symbols-outlined me-2">analytics</span> Vista General</a></li>
+                <li class="nav-item"><a class="nav-link" href="admin-usuarios.html"><span class="material-symbols-outlined me-2">manage_accounts</span> Gestión Usuarios</a></li>
+                <li class="nav-item"><a class="nav-link" href="control-alumnos.html"><span class="material-symbols-outlined me-2">group</span> Control Alumnos</a></li>
+                <li class="nav-item"><a class="nav-link" href="legajos-docentes.html"><span class="material-symbols-outlined me-2">badge</span> Legajos Docentes</a></li>
+                <li class="nav-item"><a class="nav-link" href="asignacion-docentes.html"><span class="material-symbols-outlined me-2">menu_book</span> Asignación Materias</a></li>
+                <li class="nav-item"><a class="nav-link active" href="pagos.html"><span class="material-symbols-outlined me-2">payments</span> Cuotas y Pagos</a></li>
+                <li class="nav-item"><a class="nav-link" href="reportes.html"><span class="material-symbols-outlined me-2">summarize</span> Reportes</a></li>
+                <li class="nav-item mt-3 border-top border-white border-opacity-10 pt-3">
+                    <a class="nav-link" href="index.html"><span class="material-symbols-outlined me-2">public</span> Ver Sitio Web</a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="col-md-10 main-content p-0">
+            <nav class="navbar-dashboard bg-white shadow-sm px-4 py-3 d-flex justify-content-between align-items-center">
+                <a href="dashboard.html" class="d-md-none btn btn-sm btn-outline-secondary rounded-pill">← Panel</a>
+                <span class="fw-bold text-dark">Cuotas y Pagos</span>
+                <button onclick="window.cerrarSesion()" class="btn btn-outline-danger btn-sm rounded-pill fw-bold">Cerrar Sesión</button>
+            </nav>
+
+            <div class="p-4 p-md-5">
+                <header class="mb-4">
+                    <h1 class="h3 fw-bold mb-1">Cuotas, facturación y pagos</h1>
+                    <p class="text-muted mb-0">Los pagos se realizan solo por transferencia bancaria. Las familias cargan el comprobante desde la app móvil y Administración lo valida acá.</p>
+                </header>
+
+                <ul class="nav nav-pills mb-4 gap-2" role="tablist">
+                    <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tabComprobantes" type="button">Comprobantes <span id="badgePend" class="badge bg-warning text-dark ms-1">0</span></button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabFacturas" type="button">Facturación</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabTarifas" type="button">Valores</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabMails" type="button">Correos</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabReportes" type="button">Reportes de pagos</button></li>
+                </ul>
+
+                <div class="tab-content">
+                    <!-- Comprobantes -->
+                    <section class="tab-pane fade show active" id="tabComprobantes">
+                        <div class="d-flex flex-wrap gap-2 align-items-end mb-3">
+                            <div>
+                                <label class="form-label small mb-1" for="filtroComp">Estado</label>
+                                <select id="filtroComp" class="form-select form-select-sm">
+                                    <option value="PENDIENTE">Pendientes de revisión</option>
+                                    <option value="APROBADO">Aprobados</option>
+                                    <option value="RECHAZADO">Rechazados</option>
+                                    <option value="">Todos</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary" id="btnRecargarComp">Actualizar</button>
+                        </div>
+                        <div id="avisoComp" class="d-none"></div>
+                        <div id="listaComp"></div>
+                    </section>
+
+                    <!-- Facturación -->
+                    <section class="tab-pane fade" id="tabFacturas">
+                        <div class="bg-white rounded-4 shadow-sm p-3 mb-4">
+                            <h2 class="h6 fw-bold">Emitir facturas del período</h2>
+                            <p class="small text-muted mb-2">Genera una factura por alumno activo con cuota, deportes, transporte y comedor. No duplica facturas ya emitidas. El sistema también lo hace solo el último día hábil de cada mes.</p>
+                            <div class="d-flex flex-wrap gap-2 align-items-end">
+                                <div>
+                                    <label class="form-label small mb-1" for="periodoGenerar">Período</label>
+                                    <input type="month" id="periodoGenerar" class="form-control form-control-sm">
+                                </div>
+                                <button class="btn btn-sm btn-primary" id="btnGenerar">Emitir facturas</button>
+                            </div>
+                            <div id="avisoGenerar" class="d-none mt-2"></div>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 align-items-end mb-3">
+                            <div>
+                                <label class="form-label small mb-1" for="filtroPeriodo">Período</label>
+                                <input type="month" id="filtroPeriodo" class="form-control form-control-sm">
+                            </div>
+                            <div>
+                                <label class="form-label small mb-1" for="filtroEstadoFac">Estado</label>
+                                <select id="filtroEstadoFac" class="form-select form-select-sm">
+                                    <option value="">Todos</option>
+                                    <option value="PENDIENTE">Pendiente</option>
+                                    <option value="PARCIAL">Parcial</option>
+                                    <option value="VENCIDA">Vencida</option>
+                                    <option value="PAGADA">Pagada</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary" id="btnBuscarFac">Buscar</button>
+                        </div>
+                        <div id="listaFac"></div>
+                    </section>
+
+                    <!-- Valores -->
+                    <section class="tab-pane fade" id="tabTarifas">
+                        <p class="small text-muted">Los cambios se aplican a las facturas que se emitan a partir de ahora.</p>
+                        <div class="row g-4">
+                            <div class="col-lg-4"><div class="bg-white rounded-4 shadow-sm p-3"><h2 class="h6 fw-bold">Cuotas y comedor</h2><div id="formTarifas"></div></div></div>
+                            <div class="col-lg-4"><div class="bg-white rounded-4 shadow-sm p-3"><h2 class="h6 fw-bold">Deportes (mensual)</h2><div id="formDeportes"></div></div></div>
+                            <div class="col-lg-4"><div class="bg-white rounded-4 shadow-sm p-3"><h2 class="h6 fw-bold">Transporte (mensual por recorrido)</h2><div id="formRecorridos"></div></div></div>
+                        </div>
+                        <button class="btn btn-primary mt-3" id="btnGuardarTarifas">Guardar valores</button>
+                        <div id="avisoTarifas" class="d-none mt-2"></div>
+                    </section>
+
+                    <!-- Correos -->
+                    <section class="tab-pane fade" id="tabMails">
+                        <div class="row g-4 mb-4">
+                            <div class="col-lg-6"><div class="bg-white rounded-4 shadow-sm p-3 h-100">
+                                <h2 class="h6 fw-bold">Recordatorio mensual</h2>
+                                <p class="small text-muted">Se envía automáticamente el último día hábil del mes a cada tutor, con la factura de cada hijo adjunta y el saldo anterior. Podés enviarlo a mano:</p>
+                                <div class="d-flex flex-wrap gap-2 align-items-end">
+                                    <div><label class="form-label small mb-1" for="periodoRec">Período a cobrar</label><input type="month" id="periodoRec" class="form-control form-control-sm"></div>
+                                    <div class="form-check mb-1"><input class="form-check-input" type="checkbox" id="forzarRec"><label class="form-check-label small" for="forzarRec">Reenviar aunque ya se haya enviado</label></div>
+                                    <button class="btn btn-sm btn-primary" id="btnRecordatorio">Enviar recordatorios</button>
+                                </div>
+                            </div></div>
+                            <div class="col-lg-6"><div class="bg-white rounded-4 shadow-sm p-3 h-100">
+                                <h2 class="h6 fw-bold">Aviso de deuda</h2>
+                                <p class="small text-muted">Se envía automáticamente el día 15 a quienes tengan facturas vencidas. Podés enviarlo a mano:</p>
+                                <div class="d-flex flex-wrap gap-2 align-items-end">
+                                    <div><label class="form-label small mb-1" for="periodoDeuda">Período</label><input type="month" id="periodoDeuda" class="form-control form-control-sm"></div>
+                                    <div class="form-check mb-1"><input class="form-check-input" type="checkbox" id="forzarDeuda"><label class="form-check-label small" for="forzarDeuda">Reenviar</label></div>
+                                    <button class="btn btn-sm btn-outline-danger" id="btnDeuda">Enviar avisos de deuda</button>
+                                </div>
+                            </div></div>
+                        </div>
+                        <div id="avisoMails" class="d-none"></div>
+                        <h2 class="h6 fw-bold">Historial de envíos</h2>
+                        <div id="listaMails"></div>
+                    </section>
+
+                    <!-- Reportes de pagos -->
+                    <section class="tab-pane fade" id="tabReportes">
+                        <div class="bg-white rounded-4 shadow-sm p-3 mb-3">
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-4">
+                                    <label class="form-label small mb-1" for="tipoRepPago">Reporte</label>
+                                    <select id="tipoRepPago" class="form-select form-select-sm">
+                                        <option value="ingresos">Ingresos por período</option>
+                                        <option value="completos">Pagos completos (por año y alumno)</option>
+                                        <option value="incompletos">Pagos incompletos (por año y alumno)</option>
+                                        <option value="deportes">Pagos de deportes (por deporte y nivel)</option>
+                                        <option value="transporte">Pagos de transporte (por recorrido)</option>
+                                    </select>
+                                </div>
+                                <div class="col-6 col-md-2"><label class="form-label small mb-1" for="repDesde">Desde</label><input type="month" id="repDesde" class="form-control form-control-sm"></div>
+                                <div class="col-6 col-md-2"><label class="form-label small mb-1" for="repHasta">Hasta</label><input type="month" id="repHasta" class="form-control form-control-sm"></div>
+                                <div class="col-6 col-md-2 d-none" id="boxRepDeporte"><label class="form-label small mb-1" for="repDeporte">Deporte</label><select id="repDeporte" class="form-select form-select-sm"></select></div>
+                                <div class="col-6 col-md-2 d-none" id="boxRepNivel"><label class="form-label small mb-1" for="repNivel">Nivel</label><select id="repNivel" class="form-select form-select-sm"></select></div>
+                                <div class="col-6 col-md-2 d-none" id="boxRepRecorrido"><label class="form-label small mb-1" for="repRecorrido">Recorrido</label>
+                                    <select id="repRecorrido" class="form-select form-select-sm"><option value="">Todos</option><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+                            </div>
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-sm btn-primary" id="btnRepPago">Ver reporte</button>
+                                <button class="btn btn-sm btn-outline-secondary" id="btnCsvPago" disabled>Exportar CSV</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">Imprimir</button>
+                            </div>
+                        </div>
+                        <div id="resumenRepPago" class="mb-2 fw-bold"></div>
+                        <div id="resultadoRepPago"></div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="../js/panel-admin.js"></script>
+<script>
+(function () {
+    const P = window.Panel, $ = (id) => document.getElementById(id);
+    const mostrar = (id, ok, msg) => { const a = $(id); a.classList.remove('d-none'); P.aviso(a, ok, msg); };
+    const boton = (texto, clase, accion) => { const b = P.el('button', 'btn btn-sm ' + clase, texto); b.type = 'button'; b.addEventListener('click', accion); return b; };
+    const hoy = P.periodoActual();
+    const [a, m] = hoy.split('-').map(Number);
+    const siguiente = m === 12 ? `${a + 1}-01` : `${a}-${String(m + 1).padStart(2, '0')}`;
+    $('periodoGenerar').value = hoy; $('periodoRec').value = siguiente; $('periodoDeuda').value = hoy;
+    $('repDesde').value = `${a}-01`; $('repHasta').value = hoy;
+
+    // ── Comprobantes ──
+    function cargarComprobantes() {
+        const estado = $('filtroComp').value;
+        P.api('/admin/comprobantes' + (estado ? '?estado=' + estado : '')).then((filas) => {
+            if (estado === 'PENDIENTE') $('badgePend').textContent = filas.length;
+            P.tabla($('listaComp'), [
+                { titulo: 'Comprobante', campo: 'numero' },
+                { titulo: 'Cargado', valor: (f) => P.fechaHora(f.creado_en) },
+                { titulo: 'Alumno', campo: 'alumno' },
+                { titulo: 'Factura', valor: (f) => `${f.factura} (${f.periodo})` },
+                { titulo: 'Conceptos', valor: (f) => f.items.map((i) => `${i.descripcion}: ${P.pesos(i.monto)}`).join(' · ') },
+                { titulo: 'N° operación', campo: 'nro_operacion' },
+                { titulo: 'Fecha transf.', valor: (f) => P.fecha(f.fecha_transferencia) },
+                { titulo: 'Monto', valor: (f) => P.pesos(f.monto), clase: 'text-end' },
+                { titulo: 'Origen', campo: 'origen' },
+                { titulo: 'Estado', valor: (f) => f.estado + (f.observacion ? ` — ${f.observacion}` : '') },
+                { titulo: 'Acciones', celda: (f) => {
+                    const d = P.el('div', 'd-flex gap-1 flex-wrap');
+                    if (f.tiene_archivo) d.appendChild(boton('Ver archivo', 'btn-outline-secondary', () => P.abrirArchivo(`/movil/comprobantes/${f.id_comprobante}/archivo`)));
+                    if (f.estado === 'PENDIENTE') {
+                        d.appendChild(boton('Aprobar', 'btn-success', () => revisar(f, 'APROBADO')));
+                        d.appendChild(boton('Rechazar', 'btn-outline-danger', () => revisar(f, 'RECHAZADO')));
+                    }
+                    return d;
+                } }
+            ], filas, 'No hay comprobantes en este estado.');
+        }).catch((e) => mostrar('avisoComp', false, e.message));
+    }
+    function revisar(c, estado) {
+        let observacion = '';
+        if (estado === 'RECHAZADO') {
+            observacion = prompt(`Motivo del rechazo del comprobante ${c.numero} (lo verá la familia):`);
+            if (!observacion || !observacion.trim()) return;
+        } else if (!confirm(`¿Confirmás que la transferencia ${c.nro_operacion} por ${P.pesos(c.monto)} está acreditada en la cuenta?`)) return;
+        P.api(`/admin/comprobantes/${c.id_comprobante}`, { method: 'PUT', body: { estado, observacion } })
+            .then((r) => { mostrar('avisoComp', true, r.mensaje); cargarComprobantes(); })
+            .catch((e) => mostrar('avisoComp', false, e.message));
+    }
+    $('filtroComp').addEventListener('change', cargarComprobantes);
+    $('btnRecargarComp').addEventListener('click', cargarComprobantes);
+
+    // ── Facturación ──
+    function cargarFacturas() {
+        const q = new URLSearchParams();
+        if ($('filtroPeriodo').value) q.set('periodo', $('filtroPeriodo').value);
+        if ($('filtroEstadoFac').value) q.set('estado', $('filtroEstadoFac').value);
+        P.api('/admin/facturas?' + q).then((filas) => P.tabla($('listaFac'), [
+            { titulo: 'Factura', campo: 'numero' }, { titulo: 'Período', campo: 'periodo' },
+            { titulo: 'Alumno', campo: 'alumno' }, { titulo: 'Legajo', campo: 'legajo' },
+            { titulo: 'Vence', valor: (f) => P.fecha(f.fecha_vencimiento) },
+            { titulo: 'Total', valor: (f) => P.pesos(f.total), clase: 'text-end' },
+            { titulo: 'Pagado', valor: (f) => P.pesos(f.pagado), clase: 'text-end' },
+            { titulo: 'En revisión', valor: (f) => P.pesos(f.en_revision), clase: 'text-end' },
+            { titulo: 'Saldo', valor: (f) => P.pesos(f.saldo), clase: 'text-end' },
+            { titulo: 'Estado', campo: 'estado' },
+            { titulo: '', celda: (f) => boton('PDF', 'btn-outline-secondary', () => P.abrirArchivo(`/admin/facturas/${f.id_factura}/pdf`)) }
+        ], filas, 'No hay facturas para ese filtro.')).catch((e) => mostrar('avisoGenerar', false, e.message));
+    }
+    $('btnBuscarFac').addEventListener('click', cargarFacturas);
+    $('btnGenerar').addEventListener('click', () => {
+        const periodo = $('periodoGenerar').value;
+        if (!periodo) return mostrar('avisoGenerar', false, 'Elegí un período.');
+        P.api('/admin/facturacion/generar', { method: 'POST', body: { periodo } })
+            .then((r) => { mostrar('avisoGenerar', true, r.mensaje); $('filtroPeriodo').value = periodo; cargarFacturas(); })
+            .catch((e) => mostrar('avisoGenerar', false, e.message));
+    });
+
+    // ── Valores ──
+    function campoPrecio(etiqueta, valor, datos) {
+        const g = P.el('div', 'mb-2');
+        const l = P.el('label', 'form-label small mb-0', etiqueta);
+        const i = P.el('input', 'form-control form-control-sm');
+        i.type = 'number'; i.min = '0'; i.step = '100'; i.value = valor;
+        Object.assign(i.dataset, datos);
+        g.appendChild(l); g.appendChild(i);
+        return g;
+    }
+    function cargarTarifas() {
+        P.api('/admin/tarifas').then((d) => {
+            $('formTarifas').innerHTML = ''; $('formDeportes').innerHTML = ''; $('formRecorridos').innerHTML = '';
+            d.tarifas.forEach((t) => $('formTarifas').appendChild(campoPrecio(t.descripcion || t.clave, t.monto, { tipo: 'tarifa', clave: t.clave })));
+            d.deportes.forEach((x) => $('formDeportes').appendChild(campoPrecio(`${x.nombre} (${x.nivel || '-'}, ${x.dia_semana || ''})`, x.precio, { tipo: 'deporte', id: x.id_deporte })));
+            d.recorridos.forEach((r) => $('formRecorridos').appendChild(campoPrecio(`Recorrido ${r.numero} - ${r.nombre}`, r.precio, { tipo: 'recorrido', id: r.numero })));
+        }).catch((e) => mostrar('avisoTarifas', false, e.message));
+    }
+    $('btnGuardarTarifas').addEventListener('click', () => {
+        const cuerpo = { tarifas: [], deportes: [], recorridos: [] };
+        document.querySelectorAll('#tabTarifas input[data-tipo]').forEach((i) => {
+            const v = Number(i.value);
+            if (i.dataset.tipo === 'tarifa') cuerpo.tarifas.push({ clave: i.dataset.clave, monto: v });
+            if (i.dataset.tipo === 'deporte') cuerpo.deportes.push({ id_deporte: Number(i.dataset.id), precio: v });
+            if (i.dataset.tipo === 'recorrido') cuerpo.recorridos.push({ numero: Number(i.dataset.id), precio: v });
+        });
+        P.api('/admin/tarifas', { method: 'PUT', body: cuerpo })
+            .then((r) => { mostrar('avisoTarifas', true, r.mensaje); cargarTarifas(); })
+            .catch((e) => mostrar('avisoTarifas', false, e.message));
+    });
+
+    // ── Correos ──
+    function cargarMails() {
+        P.api('/admin/mails').then((filas) => P.tabla($('listaMails'), [
+            { titulo: 'Fecha', valor: (f) => P.fechaHora(f.creado_en) }, { titulo: 'Tipo', campo: 'tipo' },
+            { titulo: 'Período', campo: 'periodo' }, { titulo: 'Tutor', campo: 'tutor' }, { titulo: 'Correo', campo: 'email' },
+            { titulo: 'Estado', campo: 'estado' }, { titulo: 'Detalle', campo: 'detalle' }
+        ], filas, 'Todavía no se enviaron correos.')).catch(() => {});
+    }
+    function enviarMails(ruta, periodo, forzar, boton) {
+        boton.disabled = true;
+        P.api(ruta, { method: 'POST', body: { periodo, forzar } }).then((r) => {
+            const n = r.envios.length;
+            const nota = r.smtp_configurado ? '' : ' (modo simulado: falta configurar SMTP en el servidor, no salió ningún correo real)';
+            mostrar('avisoMails', true, `Período ${r.periodo}: ${n} correo(s) procesado(s)${nota}.`);
+            cargarMails();
+        }).catch((e) => mostrar('avisoMails', false, e.message)).finally(() => { boton.disabled = false; });
+    }
+    $('btnRecordatorio').addEventListener('click', (ev) => enviarMails('/admin/mails/recordatorio', $('periodoRec').value, $('forzarRec').checked, ev.target));
+    $('btnDeuda').addEventListener('click', (ev) => enviarMails('/admin/mails/deuda', $('periodoDeuda').value, $('forzarDeuda').checked, ev.target));
+
+    // ── Reportes de pagos ──
+    let ultimo = null;
+    function ajustarFiltros() {
+        const t = $('tipoRepPago').value;
+        $('boxRepDeporte').classList.toggle('d-none', t !== 'deportes');
+        $('boxRepNivel').classList.toggle('d-none', t !== 'deportes');
+        $('boxRepRecorrido').classList.toggle('d-none', t !== 'transporte');
+    }
+    $('tipoRepPago').addEventListener('change', ajustarFiltros);
+    Promise.all([P.api('/deportes'), P.api('/niveles')]).then(([dep, niv]) => {
+        P.llenarSelect($('repDeporte'), dep, 'id_deporte', (d) => `${d.nombre} (${d.nivel_nombre || ''})`, 'Todos');
+        P.llenarSelect($('repNivel'), niv, 'id_nivel', (n) => n.nombre, 'Todos');
+    }).catch(() => {});
+
+    function ultimoDiaDe(periodo) {
+        const [y, mm] = periodo.split('-').map(Number);
+        return `${periodo}-${String(new Date(y, mm, 0).getDate()).padStart(2, '0')}`;
+    }
+    $('btnRepPago').addEventListener('click', () => {
+        const t = $('tipoRepPago').value, desde = $('repDesde').value, hasta = $('repHasta').value;
+        const q = new URLSearchParams();
+        const destino = $('resultadoRepPago');
+        $('resumenRepPago').textContent = '';
+        let ruta, columnas, aplanar = (x) => x;
+        if (t === 'ingresos') {
+            if (desde) q.set('desde', desde + '-01');
+            if (hasta) q.set('hasta', ultimoDiaDe(hasta));
+            ruta = '/admin/reportes/ingresos';
+            columnas = [
+                { titulo: 'Fecha', valor: (f) => P.fecha(f.fecha_transferencia) }, { titulo: 'Comprobante', campo: 'numero' },
+                { titulo: 'N° operación', campo: 'nro_operacion' }, { titulo: 'Factura', campo: 'factura' }, { titulo: 'Período', campo: 'periodo' },
+                { titulo: 'Legajo', campo: 'legajo' }, { titulo: 'Alumno', campo: 'alumno' }, { titulo: 'Monto', valor: (f) => P.pesos(f.monto), clase: 'text-end' }
+            ];
+            aplanar = (d) => {
+                $('resumenRepPago').textContent = `Total ingresado: ${P.pesos(d.total)} — ` + d.por_mes.map((x) => `${x.mes}: ${P.pesos(x.total)} (${x.pagos} pagos)`).join(' · ');
+                return d.detalle;
+            };
+        } else if (t === 'completos' || t === 'incompletos') {
+            q.set('tipo', t);
+            if (desde) q.set('desde', desde);
+            if (hasta) q.set('hasta', hasta);
+            ruta = '/admin/reportes/pagos';
+            columnas = [
+                { titulo: 'Año', campo: 'anio' }, { titulo: 'Alumno', campo: 'alumno' }, { titulo: 'Legajo', campo: 'legajo' },
+                { titulo: 'Nivel', campo: 'nivel' }, { titulo: 'Factura', campo: 'numero' }, { titulo: 'Período', campo: 'periodo' },
+                { titulo: 'Total', valor: (f) => P.pesos(f.total), clase: 'text-end' }, { titulo: 'Pagado', valor: (f) => P.pesos(f.pagado), clase: 'text-end' },
+                { titulo: 'Saldo', valor: (f) => P.pesos(f.saldo), clase: 'text-end' }, { titulo: 'Estado', campo: 'estado' }
+            ];
+            aplanar = (anios) => {
+                $('resumenRepPago').textContent = anios.map((y) => `${y.anio}: ${y.alumnos.length} alumno(s), facturado ${P.pesos(y.total)}, pagado ${P.pesos(y.pagado)}, saldo ${P.pesos(y.saldo)}`).join(' · ');
+                const filas = [];
+                anios.forEach((y) => y.alumnos.forEach((al) => al.facturas.forEach((f) => filas.push({ anio: y.anio, alumno: al.alumno, legajo: al.legajo, nivel: al.nivel, ...f }))));
+                return filas;
+            };
+        } else {
+            if (desde) q.set('desde', desde);
+            if (hasta) q.set('hasta', hasta);
+            const comunes = [
+                { titulo: 'Legajo', campo: 'legajo' }, { titulo: 'Alumno', campo: 'alumno' }, { titulo: 'Período', campo: 'periodo' },
+                { titulo: 'Monto', valor: (f) => P.pesos(f.monto), clase: 'text-end' }, { titulo: 'Pagado', valor: (f) => P.pesos(f.pagado), clase: 'text-end' },
+                { titulo: 'Saldo', valor: (f) => P.pesos(f.saldo), clase: 'text-end' }
+            ];
+            if (t === 'deportes') {
+                if ($('repDeporte').value) q.set('id_deporte', $('repDeporte').value);
+                if ($('repNivel').value) q.set('id_nivel', $('repNivel').value);
+                ruta = '/admin/reportes/pagos-deportes';
+                columnas = [{ titulo: 'Deporte', campo: 'deporte' }, { titulo: 'Nivel', campo: 'nivel' }, { titulo: 'Día', campo: 'dia_semana' },
+                    { titulo: 'Horario', campo: 'horario' }, { titulo: 'Profesor', campo: 'profesor' }, ...comunes];
+            } else {
+                if ($('repRecorrido').value) q.set('recorrido', $('repRecorrido').value);
+                ruta = '/admin/reportes/pagos-transporte';
+                columnas = [{ titulo: 'Recorrido', valor: (f) => `${f.recorrido} - ${f.recorrido_nombre || ''}` }, ...comunes];
+            }
+            aplanar = (filas) => {
+                const tot = filas.reduce((s, f) => ({ monto: s.monto + f.monto, pagado: s.pagado + f.pagado }), { monto: 0, pagado: 0 });
+                $('resumenRepPago').textContent = `Facturado ${P.pesos(tot.monto)} · Cobrado ${P.pesos(tot.pagado)} · Pendiente ${P.pesos(tot.monto - tot.pagado)}`;
+                return filas;
+            };
+        }
+        destino.textContent = 'Cargando...';
+        P.api(`${ruta}?${q}`).then((d) => {
+            const filas = aplanar(d);
+            ultimo = { nombre: `reporte-${t}`, columnas, filas };
+            $('btnCsvPago').disabled = !filas.length;
+            P.tabla(destino, columnas, filas, 'Sin datos para los filtros elegidos.');
+        }).catch((e) => { destino.textContent = e.message; });
+    });
+    $('btnCsvPago').addEventListener('click', () => ultimo && P.exportarCSV(ultimo.nombre, ultimo.columnas, ultimo.filas));
+
+    // Carga perezosa por pestaña
+    const cargadas = {};
+    const cargar = { '#tabFacturas': cargarFacturas, '#tabTarifas': cargarTarifas, '#tabMails': cargarMails };
+    document.querySelectorAll('[data-bs-toggle="pill"]').forEach((b) => b.addEventListener('shown.bs.tab', () => {
+        const t = b.dataset.bsTarget;
+        if (cargar[t] && !cargadas[t]) { cargadas[t] = true; cargar[t](); }
+    }));
+    cargarComprobantes();
+})();
+</script>
+<script type="module" src="../js/auth-guard.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -38,6 +38,9 @@
                     <li class="nav-item"><a class="nav-link" href="noticias.html">Noticias</a></li>
                     <li class="nav-item"><a class="nav-link" href="#instalaciones">Instalaciones</a></li>
                     <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#galeria">Galería</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#opiniones">Opiniones</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#empleo">Empleo</a></li>
                 </ul>
                 <div class="d-flex flex-column flex-lg-row gap-2 mt-3 mt-lg-0">
                     <a href="login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold custom-btn-hover d-flex align-items-center justify-content-center gap-2">
@@ -299,6 +302,78 @@
         </div>
     </section>
 
+    <!-- Galería de imágenes (se carga desde /api/galeria) -->
+    <section id="galeria" class="py-5 bg-white">
+        <div class="container py-4">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-dark display-6 section-heading">Galería</h2>
+                <p class="text-secondary mt-3">Recorré nuestras instalaciones.</p>
+            </div>
+            <div id="gridGaleria" class="row g-3"></div>
+        </div>
+    </section>
+
+    <!-- Opiniones: se pueden dejar sin iniciar sesión -->
+    <section id="opiniones" class="py-5 bg-soft-blue">
+        <div class="container py-4">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-dark display-6 section-heading">Opiniones de la comunidad</h2>
+                <p class="text-secondary mt-3" id="resumenOpiniones">Contanos qué te pareció. No necesitás registrarte.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <form id="formOpinion" class="bg-white p-4 rounded-4 shadow-sm" novalidate>
+                        <div class="mb-3">
+                            <label for="opNombre" class="form-label fw-semibold">Nombre</label>
+                            <input id="opNombre" class="form-control" maxlength="80" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="opComentario" class="form-label fw-semibold">Comentario</label>
+                            <textarea id="opComentario" class="form-control" rows="4" maxlength="1000" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <span class="form-label fw-semibold d-block">Calificación</span>
+                            <div id="opEstrellas" class="fs-3 text-warning" role="radiogroup" aria-label="Calificación de 1 a 5 estrellas"></div>
+                        </div>
+                        <div id="opAlerta" class="alert d-none" role="alert"></div>
+                        <button class="btn btn-primary rounded-pill px-4 fw-bold" type="submit">Enviar opinión</button>
+                    </form>
+                </div>
+                <div class="col-lg-7">
+                    <div id="listaOpiniones" class="d-flex flex-column gap-3"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Empleo -->
+    <section id="empleo" class="py-5 bg-white">
+        <div class="container py-4" style="max-width: 760px;">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-dark display-6 section-heading">Trabajá con nosotros</h2>
+                <p class="text-secondary mt-3">Buscamos docentes, preceptores y personal de apoyo comprometidos con la educación.</p>
+            </div>
+            <form id="formEmpleo" class="bg-light p-4 rounded-4" novalidate>
+                <div class="row g-3">
+                    <div class="col-md-6"><label for="emNombre" class="form-label fw-semibold">Nombre y apellido</label><input id="emNombre" class="form-control" maxlength="100" required></div>
+                    <div class="col-md-6"><label for="emEmail" class="form-label fw-semibold">Correo electrónico</label><input id="emEmail" type="email" class="form-control" maxlength="120" required></div>
+                    <div class="col-md-6"><label for="emTelefono" class="form-label fw-semibold">Teléfono</label><input id="emTelefono" class="form-control" maxlength="30"></div>
+                    <div class="col-md-6">
+                        <label for="emPuesto" class="form-label fw-semibold">Puesto</label>
+                        <select id="emPuesto" class="form-select" required>
+                            <option value="">Elegí un puesto</option>
+                            <option>Docente Nivel Inicial</option><option>Docente Nivel Primario</option><option>Docente Nivel Secundario</option>
+                            <option>Profesor/a de Educación Física</option><option>Preceptor/a</option><option>Administración</option><option>Mantenimiento</option>
+                        </select>
+                    </div>
+                    <div class="col-12"><label for="emMensaje" class="form-label fw-semibold">Contanos sobre tu experiencia</label><textarea id="emMensaje" class="form-control" rows="3" maxlength="1500"></textarea></div>
+                </div>
+                <div id="emAlerta" class="alert d-none mt-3" role="alert"></div>
+                <button class="btn btn-warning rounded-pill px-4 fw-bold mt-3" type="submit">Enviar postulación</button>
+            </form>
+        </div>
+    </section>
+
     <section id="redes" class="py-5 bg-light">
         <div class="container py-5">
             <div class="text-center mb-5 reveal">
@@ -390,5 +465,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/main.js"></script>
+    <script src="../js/api-config.js"></script>
+    <script src="../js/sitio-publico.js"></script>
 </body>
 </html>

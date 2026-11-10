@@ -20,6 +20,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('./db');
 const { verificarToken, permitirRoles } = require('./authMiddleware');
+const moduloMovil = require('./modulo-movil');
+const moduloPagos = require('./modulo-pagos');
+const moduloReportes = require('./modulo-reportes');
+const reglas = require('./reglas-negocio');
+const { notificarATodos } = require('./notificaciones');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -38,10 +43,18 @@ if (!process.env.DATABASE_URL) {
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Cliente']
 }));
 
-app.use(express.json());
+// 6 MB para admitir el archivo del comprobante de pago (máx. 3 MB) codificado en base64
+app.use(express.json({ limit: '6mb' }));
+
+// API versionada (RNFM-08): /api/v1/... es la misma API que /api/...
+// La app móvil usa /api/v1 para que futuros cambios no rompan versiones instaladas.
+app.use((req, res, next) => {
+  if (req.url === '/api/v1' || req.url.startsWith('/api/v1/')) req.url = '/api' + req.url.slice(7);
+  next();
+});
 
 // En local, Express también sirve el frontend (http://localhost:3000/html/index.html).
 // En Vercel no hace falta: los archivos estáticos los sirve Vercel directamente.
@@ -106,21 +119,17 @@ app.post('/api/auth/login', async (req, res) => {
       return fail(res, 'Credenciales inválidas', 401);
     }
 
-    // Generar el token JWT
-    const token = jwt.sign(
-      {
-        id_usuario: usuario.id_usuario,
-        rol: usuario.rol,
-        email: usuario.email,
-        nombre: `${usuario.nombre || ''} ${usuario.apellido || ''}`.trim()
-      },
-      JWT_SECRET,
-      { expiresIn: '8h' }
-    );
+    // Generar el token JWT. La app móvil (cabecera X-Cliente: movil) recibe un token corto
+    // de 15 minutos más un refresh token para renovar la sesión (RFM-11 / RNFM-03).
+    const esMovil = reglas.origenDe(req) === 'MOVIL';
+    const token = moduloMovil.firmarAcceso(usuario, esMovil ? '15m' : '8h');
+    const refresh_token = esMovil ? await moduloMovil.crearRefreshToken(usuario.id_usuario) : undefined;
+    if (esMovil) await reglas.auditar({ usuario, get: (h) => req.get(h) }, 'LOGIN');
 
     ok(res, {
       mensaje: 'Autenticación exitosa',
       token,
+      refresh_token,
       usuario: {
         id: usuario.id_usuario,
         email: usuario.email,
@@ -1822,47 +1831,14 @@ app.post('/api/deportes/inscribir', async (req, res) => {
   id_deporte = parseInt(id_deporte, 10);
 
   try {
-    // 1. Cuántos deportes tiene actualmente el alumno
-    const actuales = await db.query(`
-      SELECT d.* FROM inscripciones_deporte i
-      JOIN deportes d ON d.id_deporte = i.id_deporte
-      WHERE i.id_alumno = $1
-    `, [id_alumno]);
-
-    if (actuales.rows.length >= 2) {
-      return fail(res, 'El alumno ya alcanzó el máximo de 2 deportes extracurriculares permitidos.');
-    }
-
-    // 2. Verificar que no esté ya inscripto
-    if (actuales.rows.some(d => d.id_deporte === id_deporte)) {
-      return fail(res, 'El alumno ya está inscripto en este deporte.');
-    }
-
-    // 3. Obtener datos del nuevo deporte
-    const depNuevoRes = await db.query('SELECT * FROM deportes WHERE id_deporte = $1', [id_deporte]);
-    if (depNuevoRes.rows.length === 0) return fail(res, 'Deporte no encontrado', 404);
-    const nuevo = depNuevoRes.rows[0];
-
-    // 4. Validar superposición de horario con los que ya tiene
-    for (const d of actuales.rows) {
-      if (d.dia_semana === nuevo.dia_semana) {
-        if (nuevo.hora_inicio < d.hora_fin && nuevo.hora_fin > d.hora_inicio) {
-          return fail(res, `Superposición horaria: Se solapa los días ${d.dia_semana} con ${d.nombre} (${d.hora_inicio} a ${d.hora_fin})`);
-        }
-      }
-    }
-
-    // 5. Inscribir en base de datos
-    await db.query(`
-      INSERT INTO inscripciones_deporte (id_alumno, id_deporte)
-      VALUES ($1, $2)
-    `, [id_alumno, id_deporte]);
-
+    // Mismas reglas que la app móvil (máx. 2, sin duplicados, sin superposición por día, cupo y nivel)
+    const nuevo = await reglas.inscribirDeporte(id_alumno, id_deporte);
+    await reglas.auditar(req, 'INSCRIPCION_DEPORTE', { id_alumno, id_deporte });
     ok(res, { mensaje: `Inscripción exitosa a ${nuevo.nombre}` }, 201);
-
   } catch (error) {
+    if (error instanceof reglas.ErrorNegocio) return fail(res, error.message, error.status);
     console.error('[API /deportes/inscribir] Error:', error);
-    fail(res, error.message || 'Error al inscribir deporte', 500);
+    fail(res, 'Error al inscribir deporte', 500);
   }
 });
 
@@ -2085,6 +2061,8 @@ app.post('/api/noticias', async (req, res) => {
       RETURNING id_noticia, titulo, categoria, TO_CHAR(fecha, 'YYYY-MM-DD') as fecha, imagen_url, descripcion, cuerpo, activo, creado_en
     `;
     const result = await db.query(query, [titulo.trim(), cat, fec, img.trim(), descripcion.trim(), crp.trim()]);
+    // Novedad institucional → push a todos los usuarios de la app (RFM-10)
+    await notificarATodos({ titulo: 'Nueva noticia institucional', cuerpo: titulo.trim().slice(0, 200), tipo: 'NOTICIA', datos: { pantalla: 'noticias', id_noticia: result.rows[0].id_noticia } });
     ok(res, {
       mensaje: '¡Noticia publicada con éxito en la base de datos!',
       noticia: result.rows[0]
@@ -2115,9 +2093,23 @@ app.delete('/api/noticias/:id', async (req, res) => {
   }
 });
 
+// ─── MÓDULOS NUEVOS: APP MÓVIL, PAGOS Y REPORTES ────────────────────────────
+
+moduloMovil.registrar(app);
+moduloPagos.registrar(app);
+moduloReportes.registrar(app);
+
 // ─── 404 CATCH-ALL ──────────────────────────────────────────────────────────
 
 app.use((req, res) => fail(res, `Ruta no encontrada en la API: ${req.method} ${req.path}`, 404));
+
+// Errores no controlados (incluye JSON mal formado o cuerpo demasiado grande): siempre en JSON
+app.use((err, req, res, next) => {
+  if (err.type === 'entity.too.large') return fail(res, 'El archivo enviado es demasiado grande.', 413);
+  if (err.type === 'entity.parse.failed') return fail(res, 'El cuerpo de la petición no es JSON válido.', 400);
+  console.error(`[API ${req.method} ${req.path}]`, err);
+  fail(res, 'Error interno del servidor', 500);
+});
 
 // ─── INICIO DEL SERVIDOR ────────────────────────────────────────────────────
 
