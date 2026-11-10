@@ -22,6 +22,8 @@ import { HijoProvider } from './modulos/alumnos/hijo';
 import { PantallaAlumno, PantallaInicioPadre, PantallaInscripciones } from './modulos/alumnos/pantallas';
 import { PantallaCuotas, PantallaFactura, PantallaPagar } from './modulos/pagos/pantallas';
 import { PantallaAlumnosCurso, PantallaDocente } from './modulos/docentes/pantallas';
+import { PantallaPlanilla } from './modulos/docentes/planilla';
+import { PantallaConsulta, PantallaEmpleo, PantallaNivel, PantallaPreinscripcion } from './modulos/institucional/formularios';
 import { PantallaAvisos } from './modulos/notificaciones/pantallas';
 import { escucharToques } from './modulos/notificaciones/push';
 import { PantallaCredencial, PantallaEscaner } from './modulos/qr/pantallas';
@@ -153,6 +155,10 @@ export function Navegacion() {
             <Stack.Screen name="Publico" component={TabsPublicas} options={{ headerShown: false }} />
             <Stack.Screen name="Recuperar" component={PantallaRecuperar} options={{ title: 'Recuperar contraseña' }} />
             <Stack.Screen name="EscanerIngreso" component={PantallaEscaner} initialParams={{ modo: 'ingresar' }} options={{ title: 'Ingresar con QR' }} />
+            <Stack.Screen name="Nivel" component={PantallaNivel} options={({ route }: any) => ({ title: ({ inicial: 'Nivel Inicial', primario: 'Nivel Primario', secundario: 'Nivel Secundario' } as Record<string, string>)[route.params?.nivel] ?? 'Nivel' })} />
+            <Stack.Screen name="Preinscripcion" component={PantallaPreinscripcion} options={{ title: 'Preinscripción 2027' }} />
+            <Stack.Screen name="Consulta" component={PantallaConsulta} options={{ title: 'Contacto' }} />
+            <Stack.Screen name="Empleo" component={PantallaEmpleo} options={{ title: 'Trabajá con nosotros' }} />
           </>
         ) : estado === 'bloqueado' ? (
           <Stack.Screen name="Bloqueo" component={PantallaBloqueo} options={{ headerShown: false }} />
@@ -164,6 +170,11 @@ export function Navegacion() {
             <Stack.Screen name="Noticias" component={PantallaNoticias} options={{ title: 'Noticias' }} />
             <Stack.Screen name="Galeria" component={PantallaGaleria} options={{ title: 'Galería' }} />
             <Stack.Screen name="Opinar" component={PantallaOpinar} options={{ title: 'Opiniones' }} />
+            <Stack.Screen name="Nivel" component={PantallaNivel} options={({ route }: any) => ({ title: ({ inicial: 'Nivel Inicial', primario: 'Nivel Primario', secundario: 'Nivel Secundario' } as Record<string, string>)[route.params?.nivel] ?? 'Nivel' })} />
+            <Stack.Screen name="Preinscripcion" component={PantallaPreinscripcion} options={{ title: 'Preinscripción 2027' }} />
+            <Stack.Screen name="Consulta" component={PantallaConsulta} options={{ title: 'Contacto' }} />
+            <Stack.Screen name="Empleo" component={PantallaEmpleo} options={{ title: 'Trabajá con nosotros' }} />
+            <Stack.Screen name="Planilla" component={PantallaPlanilla} options={({ route }: any) => ({ title: route.params?.titulo ?? 'Calificaciones' })} />
             <Stack.Screen name="AlumnosCurso" component={PantallaAlumnosCurso} options={({ route }: any) => ({ title: route.params?.titulo ?? 'Alumnos' })} />
             <Stack.Screen name="FichaSalud" component={PantallaFichaSalud} options={({ route }: any) => ({ title: route.params?.nombre ? `Salud · ${route.params.nombre}` : 'Ficha de salud' })} />
             <Stack.Screen name="AsistenciaAdmin" component={PantallaAsistenciaAdmin} options={{ title: 'Asistencia del día' }} />

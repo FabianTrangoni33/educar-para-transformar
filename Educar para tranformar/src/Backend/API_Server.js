@@ -26,6 +26,7 @@ const moduloReportes = require('./modulo-reportes');
 const moduloQR = require('./modulo-qr');
 const moduloContacto = require('./modulo-contacto');
 const moduloSalud = require('./modulo-salud');
+const moduloNotas = require('./modulo-notas');
 const reglas = require('./reglas-negocio');
 const { notificarATodos } = require('./notificaciones');
 
@@ -1570,7 +1571,7 @@ app.get('/api/alumnos/:id/calificaciones', async (req, res) => {
  * POST /api/calificaciones
  * Permite a docentes y administradores registrar o actualizar una nota en PostgreSQL.
  */
-app.post('/api/calificaciones', async (req, res) => {
+app.post('/api/calificaciones', ...moduloNotas.exigirPermisoNotas, async (req, res) => {
   const { id_alumno, id_materia, trimestre, nota, observacion } = req.body;
 
   if (!id_alumno || !id_materia || !trimestre || nota === undefined) {
@@ -1634,7 +1635,7 @@ app.post('/api/calificaciones', async (req, res) => {
  * Obtiene la lista completa de alumnos de un curso con sus notas en una materia específica.
  * Query params: id_curso, id_materia
  */
-app.get('/api/calificaciones/planilla', async (req, res) => {
+app.get('/api/calificaciones/planilla', ...moduloNotas.exigirPermisoNotas, async (req, res) => {
   const { id_curso, id_materia } = req.query;
 
   if (!id_curso || !id_materia) {
@@ -1743,7 +1744,7 @@ app.get('/api/calificaciones/planilla', async (req, res) => {
  * POST /api/calificaciones/lote
  * Permite guardar o actualizar múltiples calificaciones en una sola transacción atómica.
  */
-app.post('/api/calificaciones/lote', async (req, res) => {
+app.post('/api/calificaciones/lote', ...moduloNotas.exigirPermisoNotas, async (req, res) => {
   const { calificaciones } = req.body;
 
   if (!Array.isArray(calificaciones) || calificaciones.length === 0) {
@@ -2142,6 +2143,7 @@ moduloReportes.registrar(app);
 moduloQR.registrar(app);
 moduloContacto.registrar(app);
 moduloSalud.registrar(app);
+moduloNotas.registrar(app);
 
 // ─── 404 CATCH-ALL ──────────────────────────────────────────────────────────
 

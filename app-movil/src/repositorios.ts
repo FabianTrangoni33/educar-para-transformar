@@ -7,7 +7,7 @@ import { api } from './nucleo/apiClient';
 import type {
   Perfil, ResumenAlumno, Deporte, Recorrido, DatosDocente, AlumnoDeCurso, Factura, DetalleFactura, Deuda,
   ResumenPagoHijo, Notificacion, Noticia, Opinion, Credencial, TipoMovimiento, ResultadoMovimiento,
-  FichaSalud, RespuestaSalud, ResumenAdmin, ComprobanteAdmin, AsistenciaDia
+  FichaSalud, RespuestaSalud, ResumenAdmin, ComprobanteAdmin, AsistenciaDia, Planilla
 } from './modelos';
 
 const num = (v: unknown) => (v == null ? 0 : Number(v));
@@ -81,7 +81,14 @@ export const institucionalRepo = {
   galeria: () => api.get<{ titulo: string; ruta: string }[]>('/galeria', false),
   opiniones: () => api.get<{ opiniones: Opinion[]; promedio: number | null; total: number }>('/opiniones', false),
   opinar: (nombre: string, comentario: string, calificacion: number) =>
-    api.post<{ mensaje: string }>('/opiniones', { nombre, comentario, calificacion }, false)
+    api.post<{ mensaje: string }>('/opiniones', { nombre, comentario, calificacion }, false),
+  /** Mismos formularios públicos que el sitio web: le llegan a administración en el panel web */
+  consultar: (d: { nombre: string; email: string; telefono?: string; motivo: string; mensaje: string }) =>
+    api.post<{ mensaje: string }>('/consultas', d, false),
+  postular: (d: { nombre: string; email: string; telefono?: string; puesto: string; mensaje?: string }) =>
+    api.post<{ mensaje: string }>('/empleo', d, false),
+  preinscribir: (d: Record<string, string>) =>
+    api.post<{ mensaje: string; codigo_tramite: string }>('/preinscripciones', d, false)
 };
 
 /** Valor agregado (TP1 punto 5): login con QR entre web y app, credencial digital y registro de ingresos. */
@@ -108,4 +115,11 @@ export const adminRepo = {
   revisar: (id: number, estado: 'APROBADO' | 'RECHAZADO', observacion?: string) =>
     api.put<{ mensaje: string }>(`/admin/comprobantes/${id}`, { estado, observacion }),
   asistencia: () => api.get<AsistenciaDia>('/reportes/asistencia')
+};
+
+export const notasRepo = {
+  planilla: (idCurso: number, idMateria: number) =>
+    api.get<Planilla>(`/movil/docente/planilla?id_curso=${idCurso}&id_materia=${idMateria}`),
+  guardar: (idCurso: number, idMateria: number, notas: { id_alumno: number; trimestre: number; nota: number | null; observacion?: string | null }[]) =>
+    api.put<{ mensaje: string }>('/movil/docente/calificaciones', { id_curso: idCurso, id_materia: idMateria, notas })
 };

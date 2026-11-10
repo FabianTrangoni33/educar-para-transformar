@@ -28,7 +28,7 @@ export type ResumenAlumno = {
 export type Deporte = { id_deporte: number; nombre: string; id_nivel: number | null; nivel_nombre: string | null; dia_semana: string; hora_inicio: string; hora_fin: string; cupo_maximo: number; inscriptos_actuales: number; precio_mensual: number };
 export type Recorrido = { numero: number; nombre: string; zona: string; paradas: string[]; horario_ida: string; horario_vuelta: string; precio: number };
 
-export type Asignacion = { id_asignacion: number; id_curso: number | null; materia: string; carga_horaria: number; curso: string | null; division: string | null; nivel: string | null; alumnos: number; horarios: BloqueHorario[] };
+export type Asignacion = { id_asignacion: number; id_curso: number | null; id_materia: number; materia: string; carga_horaria: number; curso: string | null; division: string | null; nivel: string | null; alumnos: number; horarios: BloqueHorario[] };
 export type AlumnoDeCurso = { id_alumno: number; legajo: string; nombre: string; apellido: string; edad: number | null; tutores: { nombre: string; parentesco: string | null; telefono: string | null }[] };
 export type DatosDocente = { asignaciones: Asignacion[]; deportes: { id_deporte: number; nombre: string; dia_semana: string; inicio: string; fin: string; nivel: string | null; inscriptos: number }[] };
 
@@ -74,3 +74,7 @@ export type AsistenciaDia = {
   fecha: string; total: number; presentes: number; ausentes: number;
   alumnos: { nivel: string; curso: string; division: string | null; legajo: string; alumno: string; ingreso: string | null; egreso: string | null; presente: boolean }[];
 };
+
+// ── Calificaciones (docente) ──
+export type FilaPlanilla = { id_alumno: number; legajo: string; nombre: string; apellido: string; t1: number | null; t2: number | null; t3: number | null; obs1: string | null; obs2: string | null; obs3: string | null };
+export type Planilla = { curso: { id_curso: number; nombre: string; division: string | null }; materia: { id_materia: number; nombre: string }; alumnos: FilaPlanilla[] };

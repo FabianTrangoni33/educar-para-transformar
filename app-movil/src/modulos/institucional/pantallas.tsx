@@ -9,9 +9,9 @@ import { useConsulta } from '../../nucleo/hooks';
 import { institucionalRepo } from '../../repositorios';
 
 const NIVELES = [
-  { icono: 'happy-outline', nombre: 'Nivel Inicial', detalle: 'Salas de 3, 4 y 5 años con jornada extendida.' },
-  { icono: 'book-outline', nombre: 'Nivel Primario', detalle: '1° a 6° grado. Inglés, portugués y francés.' },
-  { icono: 'school-outline', nombre: 'Nivel Secundario', detalle: 'Ciclo básico y orientado, laboratorios de física, química y computación.' }
+  { clave: 'inicial', icono: 'happy-outline', nombre: 'Nivel Inicial', detalle: 'Salas de 3, 4 y 5 años con jornada extendida.' },
+  { clave: 'primario', icono: 'book-outline', nombre: 'Nivel Primario', detalle: '1° a 7° grado. Inglés, portugués y francés.' },
+  { clave: 'secundario', icono: 'school-outline', nombre: 'Nivel Secundario', detalle: 'Ciclo básico y orientado, laboratorios de física, química y computación.' }
 ] as const;
 
 const BIENESTAR = [
@@ -34,7 +34,12 @@ export function PantallaInstitucional({ navigation }: any) {
       </Tarjeta>
 
       <Seccion titulo="Niveles educativos">
-        <Tarjeta>{NIVELES.map(n => <Fila key={n.nombre} icono={n.icono} titulo={n.nombre} detalle={n.detalle} />)}</Tarjeta>
+        {NIVELES.map(n => (
+          <Tarjeta key={n.nombre} alPresionar={() => navigation.navigate('Nivel', { nivel: n.clave })} etiqueta={n.nombre}>
+            <Fila icono={n.icono} titulo={n.nombre} detalle={n.detalle} derecha={<Ionicons name="chevron-forward" size={20} color={colores.textoSuave} />} />
+          </Tarjeta>
+        ))}
+        <Boton texto="Preinscripción 2027" icono="document-text-outline" alPresionar={() => navigation.navigate('Preinscripcion')} />
       </Seccion>
 
       <Seccion titulo="Bienestar estudiantil">
@@ -48,6 +53,8 @@ export function PantallaInstitucional({ navigation }: any) {
       </Seccion>
 
       <Seccion titulo="Contacto">
+        <Tarjeta alPresionar={() => navigation.navigate('Consulta')} etiqueta="Contacto y consultas"><Fila icono="chatbubble-ellipses-outline" titulo="Contacto y consultas" detalle="Escribinos y te respondemos por correo" derecha={<Ionicons name="chevron-forward" size={20} color={colores.textoSuave} />} /></Tarjeta>
+        <Tarjeta alPresionar={() => navigation.navigate('Empleo')} etiqueta="Trabajá con nosotros"><Fila icono="briefcase-outline" titulo="Trabajá con nosotros" detalle="Dejá tu postulación" derecha={<Ionicons name="chevron-forward" size={20} color={colores.textoSuave} />} /></Tarjeta>
         <Boton texto="Escribinos por WhatsApp" icono="logo-whatsapp" variante="secundario" alPresionar={() => Linking.openURL(`https://wa.me/${config.contacto.whatsapp}`)} />
         <Boton texto={config.contacto.email} icono="mail-outline" variante="texto" alPresionar={() => Linking.openURL(`mailto:${config.contacto.email}`)} />
       </Seccion>

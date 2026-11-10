@@ -1,10 +1,14 @@
 /** Módulo Alumnos: inicio del padre, datos académicos (RFM-04, RFM-05) e inscripciones (RFM-06/07/08). */
 import React, { useState } from 'react';
 import { Alert, Text, View } from 'react-native';
+import * as Sharing from 'expo-sharing';
+import { File, Paths } from 'expo-file-system';
 import { Ionicons } from '@expo/vector-icons';
 import { AvisoSinConexion, Boton, Chip, Contenido, Fila, Pantalla, Seccion, Tarjeta, Titulo, Vacio, s } from '../../componentes/ui';
 import { colores, espacio, fecha, pesos } from '../../tema';
 import { hayConexion, useConsulta } from '../../nucleo/hooks';
+import { config } from '../../config';
+import { api } from '../../nucleo/apiClient';
 import { alumnosRepo, pagosRepo } from '../../repositorios';
 import { useSesion } from '../acceso/sesion';
 import { SelectorHijo, useHijo } from './hijo';
@@ -62,6 +66,24 @@ export function PantallaAlumno({ route, navigation }: any) {
   const idAlumno: number | undefined = route?.params?.idAlumno ?? perfil?.alumno?.id_alumno;
   const consulta = useConsulta(idAlumno ? `resumen-${idAlumno}` : null, () => alumnosRepo.resumen(idAlumno!));
   const [vista, setVista] = useState<'materias' | 'horarios' | 'servicios'>('materias');
+  const [descargando, setDescargando] = useState(false);
+
+  /** Boletín de calificaciones en PDF (el mismo que genera la web) */
+  const descargarBoletin = async () => {
+    setDescargando(true);
+    try {
+      await api.renovar().catch(() => false);
+      const destino = new File(Paths.cache, `Boletin-${idAlumno}.pdf`);
+      if (destino.exists) destino.delete();
+      const archivo = await File.downloadFileAsync(`${config.apiUrl}/movil/alumnos/${idAlumno}/boletin/pdf`, destino, {
+        headers: { Authorization: `Bearer ${api.getToken()}`, 'X-Cliente': 'movil' }
+      });
+      if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(archivo.uri, { mimeType: 'application/pdf', dialogTitle: 'Boletín' });
+      else Alert.alert('Boletín descargado', archivo.uri);
+    } catch {
+      Alert.alert('No se pudo descargar', 'Revisá tu conexión e intentá nuevamente.');
+    } finally { setDescargando(false); }
+  };
 
   if (!idAlumno) return <Vacio texto="Tu usuario no está asociado a un legajo de alumno." />;
   return (
@@ -76,6 +98,8 @@ export function PantallaAlumno({ route, navigation }: any) {
               <Text style={s.textoSuave}>Legajo {d.alumno.legajo} · {d.alumno.estado}</Text>
               <Boton texto="Ficha de salud" icono="medkit-outline" variante="secundario" estilo={{ marginTop: espacio.s }}
                 alPresionar={() => navigation.navigate('FichaSalud', { idAlumno, nombre: d.alumno.nombre })} />
+              <Boton texto="Descargar boletín (PDF)" icono="document-outline" variante="secundario" cargando={descargando}
+                alPresionar={descargarBoletin} />
             </Tarjeta>
             <View style={[s.filaChips, { marginBottom: espacio.s }]}>
               <Chip texto="Materias y notas" activo={vista === 'materias'} alPresionar={() => setVista('materias')} />

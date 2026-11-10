@@ -16,7 +16,7 @@ export const config = {
   timeoutMs: 15000,
   /** Datos bancarios para pagar por transferencia */
   banco: { cbu: '0000003100012345678901', alias: 'EDUCAR.TRANSFORMAR.CUOTAS', titular: 'Centro Educativo Educar para Transformar' },
-  contacto: { telefono: '+54 362 400-0000', whatsapp: '5493624000000', email: 'info@educarparatransformar.edu.ar' }
+  contacto: { telefono: '+54 362 400-0000', whatsapp: '543624781240', email: 'info@educarparatransformar.edu.ar' }
 };
 
 /** Convierte rutas del sitio ("../img/x.jpg" o "/img/x.jpg") en URL absolutas */

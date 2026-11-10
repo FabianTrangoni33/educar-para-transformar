@@ -517,7 +517,7 @@
             try {
                 const res = await fetch(`${API_BASE_DOCENTE}/calificaciones`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
                     body: JSON.stringify({
                         id_alumno: parseInt(id_alumno, 10),
                         id_materia: parseInt(id_materia, 10),
@@ -770,7 +770,7 @@
         }
 
         try {
-            const res = await fetch(`${API_BASE}/calificaciones/planilla?id_curso=${idCurso}&id_materia=${idMateria}`);
+            const res = await fetch(`${API_BASE}/calificaciones/planilla?id_curso=${idCurso}&id_materia=${idMateria}`, { headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') } });
             const data = await res.json();
 
             if (!res.ok || !data.ok) {
@@ -996,7 +996,7 @@
         try {
             const res = await fetch(`${API_BASE}/calificaciones/lote`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
                 body: JSON.stringify({ calificaciones: notasAGuardar })
             });
             const data = await res.json();
@@ -1072,7 +1072,7 @@
         try {
             const res = await fetch(`${API_BASE}/calificaciones/lote`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
                 body: JSON.stringify({ calificaciones: listaAGuardar })
             });
             const data = await res.json();

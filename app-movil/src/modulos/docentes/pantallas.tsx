@@ -41,6 +41,10 @@ export function PantallaDocente({ navigation }: any) {
                           {a.horarios.length === 0 ? <Text style={s.textoSuave}>Sin horarios cargados.</Text> :
                             a.horarios.map((h, i) => <Fila key={i} icono="time-outline" titulo={h.dia} detalle={`${h.inicio} - ${h.fin}${h.aula ? ` · ${h.aula}` : ''}`} />)}
                           {a.id_curso ? (
+                            <Boton texto="Cargar notas" icono="create-outline"
+                              alPresionar={() => navigation.navigate('Planilla', { idCurso: a.id_curso, idMateria: a.id_materia, titulo: `${a.materia} · ${a.curso ?? 'Curso'}${a.division ? ` "${a.division}"` : ''}` })} />
+                          ) : null}
+                          {a.id_curso ? (
                             <Boton texto={`Ver alumnos (${a.alumnos})`} icono="people-outline" variante="secundario"
                               alPresionar={() => navigation.navigate('AlumnosCurso', { idCurso: a.id_curso, titulo: `${a.curso ?? 'Curso'}${a.division ? ` "${a.division}"` : ''}` })} />
                           ) : null}
