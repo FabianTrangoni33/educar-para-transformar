@@ -5,7 +5,7 @@
  */
 import { api } from './nucleo/apiClient';
 import type {
-  Perfil, ResumenAlumno, Deporte, Recorrido, DatosDocente, Factura, DetalleFactura, Deuda,
+  Perfil, ResumenAlumno, Deporte, Recorrido, DatosDocente, AlumnoDeCurso, Factura, DetalleFactura, Deuda,
   ResumenPagoHijo, Notificacion, Noticia, Opinion, Credencial, TipoMovimiento, ResultadoMovimiento
 } from './modelos';
 
@@ -52,7 +52,8 @@ export const alumnosRepo = {
 };
 
 export const docentesRepo = {
-  asignaciones: () => api.get<DatosDocente>('/movil/docente/asignaciones')
+  asignaciones: () => api.get<DatosDocente>('/movil/docente/asignaciones'),
+  alumnosDeCurso: (idCurso: number) => api.get<AlumnoDeCurso[]>(`/movil/docente/cursos/${idCurso}/alumnos`)
 };
 
 export const pagosRepo = {

@@ -23,7 +23,7 @@ import { PantallaGaleria, PantallaInstitucional, PantallaNoticias, PantallaOpina
 import { HijoProvider } from './modulos/alumnos/hijo';
 import { PantallaAlumno, PantallaInicioPadre, PantallaInscripciones } from './modulos/alumnos/pantallas';
 import { PantallaCuotas, PantallaFactura, PantallaPagar } from './modulos/pagos/pantallas';
-import { PantallaDocente } from './modulos/docentes/pantallas';
+import { PantallaAlumnosCurso, PantallaDocente } from './modulos/docentes/pantallas';
 import { PantallaAvisos } from './modulos/notificaciones/pantallas';
 import { escucharToques } from './modulos/notificaciones/push';
 import { PantallaCredencial, PantallaEscaner } from './modulos/qr/pantallas';
@@ -39,7 +39,7 @@ const opcionesTabs = (icono: Icono, titulo: string, conEncabezado = true) => ({
   headerShown: conEncabezado,
   ...encabezado,
   tabBarIcon: ({ color, size }: { color: string; size: number }) => <Ionicons name={icono} color={color} size={size} />,
-  tabBarActiveTintColor: colores.primario,
+  tabBarActiveTintColor: colores.acentoTexto,
   tabBarInactiveTintColor: colores.textoSuave,
   tabBarLabelStyle: { fontSize: 12 }
 });
@@ -167,6 +167,7 @@ export function Navegacion() {
             <Stack.Screen name="Noticias" component={PantallaNoticias} options={{ title: 'Noticias' }} />
             <Stack.Screen name="Galeria" component={PantallaGaleria} options={{ title: 'Galería' }} />
             <Stack.Screen name="Opinar" component={PantallaOpinar} options={{ title: 'Opiniones' }} />
+            <Stack.Screen name="AlumnosCurso" component={PantallaAlumnosCurso} options={({ route }: any) => ({ title: route.params?.titulo ?? 'Alumnos' })} />
             {/* Valor agregado: credencial digital y escáner QR */}
             <Stack.Screen name="Credencial" component={PantallaCredencial} options={{ title: 'Credencial digital' }} />
             <Stack.Screen name="Escaner" component={PantallaEscaner} options={({ route }: any) => ({ title: route.params?.modo === 'autorizar-web' ? 'Ingresar en la web' : 'Portería' })} />

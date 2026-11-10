@@ -17,7 +17,7 @@
     "android": {
       "package": "ar.edu.educarparatransformar.app",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#0B2545",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -43,7 +43,7 @@
       [
         "expo-notifications",
         {
-          "color": "#1f4e79"
+          "color": "#0B2545"
         }
       ],
       "expo-font",

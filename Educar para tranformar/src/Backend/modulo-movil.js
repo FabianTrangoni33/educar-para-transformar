@@ -350,6 +350,30 @@ function registrar(app) {
     ok(res, { asignaciones: asig.rows, deportes: deportes.rows, sincronizado_en: new Date().toISOString() });
   }));
 
+  /**
+   * GET /api/movil/docente/cursos/:id/alumnos → alumnos activos del curso con el contacto de sus tutores.
+   * Solo si el docente logueado tiene al menos una materia asignada en ese curso.
+   */
+  app.get('/api/movil/docente/cursos/:id/alumnos', requiereAuth, soloRoles('DOCENTE'), manejar(async (req, res) => {
+    const idCurso = Number(req.params.id);
+    if (!Number.isInteger(idCurso) || idCurso <= 0) return fail(res, 'Curso inválido.');
+    const permiso = await db.query(`
+      SELECT 1 FROM asignaciones_docente ad JOIN profesores p ON p.id_profesor = ad.id_profesor
+      WHERE p.id_usuario = $1 AND ad.id_curso = $2 LIMIT 1`, [req.usuario.id_usuario, idCurso]);
+    if (!permiso.rowCount) return fail(res, 'No tenés materias asignadas en ese curso.', 403);
+    const r = await db.query(`
+      SELECT a.id_alumno, a.legajo, a.nombre, a.apellido,
+             DATE_PART('year', AGE(a.fecha_nacimiento))::int AS edad,
+             COALESCE((
+               SELECT JSON_AGG(JSON_BUILD_OBJECT('nombre', t.nombre || ' ' || t.apellido, 'parentesco', ta.parentesco, 'telefono', t.telefono)
+                      ORDER BY t.apellido)
+               FROM tutor_alumno ta JOIN tutores t ON t.id_tutor = ta.id_tutor WHERE ta.id_alumno = a.id_alumno), '[]'::json) AS tutores
+      FROM alumnos a
+      WHERE a.id_curso = $1 AND a.estado = 'ACTIVO'
+      ORDER BY a.apellido, a.nombre`, [idCurso]);
+    ok(res, r.rows);
+  }));
+
   // ── Notificaciones ────────────────────────────────────────────────────────
 
   /** POST /api/dispositivos { token_push, plataforma } → asocia el dispositivo al usuario */

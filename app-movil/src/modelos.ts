@@ -28,7 +28,8 @@ export type ResumenAlumno = {
 export type Deporte = { id_deporte: number; nombre: string; id_nivel: number | null; nivel_nombre: string | null; dia_semana: string; hora_inicio: string; hora_fin: string; cupo_maximo: number; inscriptos_actuales: number; precio_mensual: number };
 export type Recorrido = { numero: number; nombre: string; zona: string; paradas: string[]; horario_ida: string; horario_vuelta: string; precio: number };
 
-export type Asignacion = { id_asignacion: number; materia: string; carga_horaria: number; curso: string | null; division: string | null; nivel: string | null; alumnos: number; horarios: BloqueHorario[] };
+export type Asignacion = { id_asignacion: number; id_curso: number | null; materia: string; carga_horaria: number; curso: string | null; division: string | null; nivel: string | null; alumnos: number; horarios: BloqueHorario[] };
+export type AlumnoDeCurso = { id_alumno: number; legajo: string; nombre: string; apellido: string; edad: number | null; tutores: { nombre: string; parentesco: string | null; telefono: string | null }[] };
 export type DatosDocente = { asignaciones: Asignacion[]; deportes: { id_deporte: number; nombre: string; dia_semana: string; inicio: string; fin: string; nivel: string | null; inscriptos: number }[] };
 
 export type EstadoFactura = 'PENDIENTE' | 'PARCIAL' | 'PAGADA' | 'VENCIDA';

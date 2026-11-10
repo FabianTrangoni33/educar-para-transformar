@@ -174,7 +174,7 @@ function TarjetaCredencial({ c }: { c: Credencial }) {
   return (
     <View style={estilos.credencial} accessible accessibilityLabel={`Credencial de ${c.nombre} ${c.apellido}, legajo ${c.legajo}`}>
       <View style={estilos.credencialCabecera}>
-        <Ionicons name="school" size={22} color="#fff" />
+        <Ionicons name="school" size={22} color={colores.acento} />
         <View style={{ marginLeft: espacio.s }}>
           <Text style={{ color: '#fff', fontWeight: '700' }}>Educar para Transformar</Text>
           <Text style={{ color: '#dbe7f3', fontSize: 12 }}>Credencial estudiantil digital</Text>
@@ -198,6 +198,6 @@ const estilos = StyleSheet.create({
   panel: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: colores.superficie, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: espacio.l },
   resultado: { flexDirection: 'row', alignItems: 'flex-start', padding: espacio.m, borderRadius: radio, marginTop: espacio.s },
   credencial: { backgroundColor: colores.superficie, borderRadius: 16, borderWidth: 1, borderColor: colores.borde, overflow: 'hidden', marginBottom: espacio.l },
-  credencialCabecera: { backgroundColor: colores.primario, flexDirection: 'row', alignItems: 'center', padding: espacio.m },
+  credencialCabecera: { backgroundColor: colores.primario, flexDirection: 'row', alignItems: 'center', padding: espacio.m, borderBottomWidth: 4, borderBottomColor: colores.acento },
   qr: { width: 240, height: 240, marginVertical: espacio.m, backgroundColor: '#fff' }
 });

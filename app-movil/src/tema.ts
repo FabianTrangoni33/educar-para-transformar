@@ -1,8 +1,14 @@
-/** Paleta y medidas comunes (Material Design 3 / HIG: zonas táctiles de 48 dp como mínimo) */
+/**
+ * Paleta institucional (la misma del sitio web y del logo: azul marino, naranja y turquesa)
+ * y medidas comunes (Material Design 3 / HIG: zonas táctiles de 48 dp como mínimo).
+ */
 export const colores = {
-  primario: '#1f4e79',
-  primarioClaro: '#e3edf7',
-  secundario: '#2e86c1',
+  primario: '#0B2545',
+  primarioClaro: '#e7edf5',
+  secundario: '#14B8A6',
+  acento: '#F97316',
+  acentoTexto: '#C2410C', // naranja oscuro: contraste suficiente para texto chico sobre blanco
+  acentoClaro: '#fff1e6',
   fondo: '#f4f6f9',
   superficie: '#ffffff',
   texto: '#1b1f24',
