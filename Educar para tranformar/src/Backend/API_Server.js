@@ -10,7 +10,10 @@
  * =============================================================================
  */
 
-require('dotenv').config();
+const path = require('path');
+// Carga src/Backend/.env sin importar desde qué carpeta se ejecute (en Vercel no existe
+// el archivo y las variables vienen del panel "Environment Variables").
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
@@ -21,6 +24,14 @@ const { verificarToken, permitirRoles } = require('./authMiddleware');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'clave_secreta_default';
+const EN_VERCEL = Boolean(process.env.VERCEL);
+
+if (EN_VERCEL && !process.env.JWT_SECRET) {
+  console.warn('[Config] JWT_SECRET no está definido en Vercel: se usa una clave por defecto insegura.');
+}
+if (!process.env.DATABASE_URL) {
+  console.warn('[Config] DATABASE_URL no está definido: las consultas a la base de datos van a fallar.');
+}
 
 // ─── MIDDLEWARES GLOBALES ───────────────────────────────────────────────────
 
@@ -32,9 +43,12 @@ app.use(cors({
 
 app.use(express.json());
 
-// Servir archivos estáticos del frontend si se accede directo por el puerto 3000
-app.use(express.static('../'));
-app.get('/', (req, res) => res.redirect('/html/index.html'));
+// En local, Express también sirve el frontend (http://localhost:3000/html/index.html).
+// En Vercel no hace falta: los archivos estáticos los sirve Vercel directamente.
+if (!EN_VERCEL) {
+  app.use(express.static(path.join(__dirname, '..')));
+  app.get('/', (req, res) => res.redirect('/html/index.html'));
+}
 
 // ─── HELPERS DE RESPUESTA UNIFORME ──────────────────────────────────────────
 
@@ -1314,30 +1328,7 @@ app.delete('/api/asignaciones/id/:id', async (req, res) => {
 });
 
 // ─── 5. ALUMNOS ─────────────────────────────────────────────────────────────
-
-app.get('/api/alumnos', async (req, res) => {
-  try {
-    const result = await db.query(`
-      SELECT
-        a.id_alumno as id, a.legajo, a.dni, a.nombre, a.apellido,
-        a.correo as email, a.estado,
-        u.edad, u.genero,
-        c.id_curso, c.nombre as curso, c.anio_escolar, c.division,
-        n.nombre as nivel,
-        ci.nombre as ciclo
-      FROM alumnos a
-      LEFT JOIN usuarios u ON u.id_usuario = a.id_usuario
-      LEFT JOIN cursos c ON c.id_curso = a.id_curso
-      LEFT JOIN niveles n ON n.id_nivel = c.id_nivel
-      LEFT JOIN ciclos ci ON ci.id_ciclo = c.id_ciclo
-      ORDER BY a.apellido, a.nombre
-    `);
-    ok(res, result.rows);
-  } catch (error) {
-    console.error('[API /alumnos] Error:', error);
-    fail(res, 'Error al obtener alumnos', 500);
-  }
-});
+// (GET /api/alumnos está definido más arriba, en la sección de cursos)
 
 /**
  * GET /api/alumnos/:id
@@ -2130,7 +2121,11 @@ app.use((req, res) => fail(res, `Ruta no encontrada en la API: ${req.method} ${r
 
 // ─── INICIO DEL SERVIDOR ────────────────────────────────────────────────────
 
-app.listen(PORT, () => {
+// Vercel importa este archivo como función serverless y usa la app exportada.
+module.exports = app;
+
+// Solo se levanta el servidor cuando se ejecuta directo: `node API_Server.js`
+if (require.main === module) app.listen(PORT, () => {
   console.log(`\n🚀 NovaSYS API (PostgreSQL + JWT) corriendo en http://localhost:${PORT}`);
   console.log('📡 Base de datos conectada: Neon Cloud PostgreSQL');
   console.log('🔐 Autenticación: JWT activo con RBAC');

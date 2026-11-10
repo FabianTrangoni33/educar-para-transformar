@@ -12,7 +12,8 @@
  * =============================================================================
  */
 
-const API_BASE = 'https://metodologia-2.onrender.com/api';
+// URL base compartida (ver src/js/api-config.js)
+const API_BASE = window.API_BASE || '/api';
 const MAX_HORAS_DOCENTE = 200;
 
 // Caché en memoria para acceso rápido y renderizado fluido

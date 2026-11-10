@@ -1,0 +1,20 @@
+{
+  "name": "educar-para-transformar",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Despliegue en Vercel: frontend estático + API Express (Neon PostgreSQL)",
+  "scripts": {
+    "dev": "node \"Educar para tranformar/src/Backend/API_Server.js\""
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.9",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.23.1"
+  }
+}

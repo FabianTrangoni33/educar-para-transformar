@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "npm install",
+  "buildCommand": null,
+  "outputDirectory": "Educar para tranformar/src",
+  "redirects": [
+    { "source": "/", "destination": "/html/index.html", "permanent": false },
+    { "source": "/Backend/:path*", "destination": "/html/index.html", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" }
+  ]
+}

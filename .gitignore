@@ -22,6 +22,12 @@ yarn-error.log*
 .env.development.local
 .env.production.local
 
+# Vercel (configuración local de la CLI)
+.vercel/
+
+# Grafo de conocimiento generado por graphify
+graphify-out/
+
 # Temporales y Registros
 *.log
 scratch/

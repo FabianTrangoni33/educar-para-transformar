@@ -13,7 +13,8 @@
  * =============================================================================
  */
 
-const API_BASE = 'https://metodologia-2.onrender.com/api';
+// URL base compartida (ver src/js/api-config.js)
+const API_BASE = window.API_BASE || '/api';
 
 // ─── CATÁLOGO OFICIAL DE DEPORTES (HU-02) ────────────────────────────────────
 export const DEPORTES_CATALOGO = [

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../js/api-config.js"></script>
     <title>Preinscripciones - Educar para Transformar</title>
     <link rel="icon" href="../img/logo.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -235,7 +236,7 @@
 
             try {
                 // 1. Guardar en PostgreSQL en Neon Cloud mediante REST API
-                const res = await fetch('http://localhost:3000/api/preinscripciones', {
+                const res = await fetch(`${API_BASE}/preinscripciones`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)

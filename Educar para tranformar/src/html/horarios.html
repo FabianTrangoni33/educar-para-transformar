@@ -152,11 +152,12 @@
     } else {
         const rol = (usuario.rol || '').toUpperCase();
         if (['PADRE', 'TUTOR', 'FAMILIA'].includes(rol)) {
+            // Los tutores ven los horarios dentro del portal unificado
             window.location.replace('hijo.html?tab=horarios');
-            return;
+        } else {
+            document.getElementById('txtNombreSidebar').innerText = usuario.nombre;
+            document.getElementById('navNombreAlumno').innerText = usuario.nombre;
         }
-        document.getElementById('txtNombreSidebar').innerText = usuario.nombre;
-        document.getElementById('navNombreAlumno').innerText = usuario.nombre;
     }
     document.getElementById('btnCerrarSesionTop').addEventListener('click', () => {
         localStorage.removeItem('usuario');
