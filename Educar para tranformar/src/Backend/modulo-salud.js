@@ -43,11 +43,15 @@ function asegurarTablas() {
 }
 const conTablas = (fn) => manejar(async (req, res) => { await asegurarTablas(); return fn(req, res); });
 
-/** Docente con al menos una materia en el curso del alumno */
+/**
+ * Docente con al menos una materia en el curso del alumno: asignada a ese curso, o asignada
+ * sin curso fijo pero dictada en él (mismo criterio que la lista de alumnos del panel web).
+ */
 async function esDocenteDelAlumno(idUsuario, idAlumno) {
   const r = await db.query(`
     SELECT 1 FROM alumnos a
     JOIN asignaciones_docente ad ON ad.id_curso = a.id_curso
+      OR (ad.id_curso IS NULL AND EXISTS (SELECT 1 FROM curso_materia cm WHERE cm.id_materia = ad.id_materia AND cm.id_curso = a.id_curso))
     JOIN profesores p ON p.id_profesor = ad.id_profesor
     WHERE a.id_alumno = $1 AND p.id_usuario = $2 LIMIT 1`, [idAlumno, idUsuario]);
   return r.rowCount > 0;
