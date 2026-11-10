@@ -3,7 +3,7 @@
  *
  * - En login.html / login-admin.html: botón "Ingresar con QR". La web muestra un QR, el usuario lo escanea
  *   con la app (ya logueada) y la web entra sin escribir la contraseña.
- * - En los paneles (con sesión): botón flotante con
+ * - En los paneles (con sesión): un botón redondo con menú:
  *     · "Abrir en la app": QR de un solo uso para entrar a la app con la misma cuenta.
  *     · "Credencial digital" (familias y alumnos): QR de la credencial de cada alumno.
  *
@@ -190,13 +190,19 @@
   }
 
   // ── Montaje según la página ──
+  var ICONO_QR = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="flex:none"><path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm11-2h2v2h-2v-2zm-3 0h2v3h-2v-3zm3 3h2v2h-2v-2zm2 2h3v3h-2v-1h-1v-2zm-5 0h2v3h-2v-3zm3 2h2v1h-2v-1zm3-7h3v2h-3v-2z"/></svg>';
   function boton(texto, alClic, estilo) {
-    var b = el('button', estilo, texto);
+    var b = el('button', estilo);
     b.type = 'button';
+    b.innerHTML = ICONO_QR;
+    b.appendChild(el('span', '', texto));
     b.addEventListener('click', alClic);
     return b;
   }
   var pagina = (location.pathname.split('/').pop() || '').toLowerCase();
+
+  // Funciones disponibles para otras pantallas (ej.: botones dentro del panel).
+  window.QRSesion = { ingresarConQR: ingresarConQR, abrirEnApp: abrirEnApp, verCredenciales: verCredenciales };
 
   function montar() {
     if (pagina === 'login.html' || pagina === 'login-admin.html') {
@@ -204,20 +210,48 @@
       if (!form) return;
       var separador = el('div', 'display:flex;align-items:center;gap:8px;color:#8a94a0;font-size:.85rem;margin:6px 0 10px');
       separador.innerHTML = '<span style="flex:1;height:1px;background:#dde3ea"></span>o<span style="flex:1;height:1px;background:#dde3ea"></span>';
-      var b = boton('📱 Ingresar con QR desde la app', ingresarConQR,
-        'width:100%;border:2px solid #1f4e79;color:#1f4e79;background:#fff;border-radius:12px;padding:12px;font-weight:700;cursor:pointer');
+      var b = boton('Ingresar con QR desde la app', ingresarConQR,
+        'width:100%;display:flex;align-items:center;justify-content:center;gap:8px;border:2px solid #1f4e79;color:#1f4e79;background:#fff;border-radius:12px;padding:11px;font-weight:700;cursor:pointer');
       form.appendChild(separador);
       form.appendChild(b);
       return;
     }
-    // Paneles con sesión
+    // Paneles con sesión: un solo botón redondo que despliega un menú chico.
     if (!localStorage.getItem('token')) return;
     var usuario = {};
     try { usuario = JSON.parse(localStorage.getItem('usuario')) || {}; } catch (e) { /* sin datos */ }
-    var caja = el('div', 'position:fixed;right:16px;bottom:16px;z-index:2000;display:flex;flex-direction:column;gap:8px;align-items:flex-end');
-    var estiloBoton = 'border:0;background:#1f4e79;color:#fff;border-radius:999px;padding:10px 18px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.2);cursor:pointer';
-    if (usuario.rol === 'familia' || usuario.rol === 'alumno') caja.appendChild(boton('🪪 Credencial digital', verCredenciales, estiloBoton));
-    caja.appendChild(boton('📱 Abrir en la app', abrirEnApp, estiloBoton));
+    var caja = el('div', 'position:fixed;right:16px;bottom:16px;z-index:1040;display:flex;flex-direction:column;align-items:flex-end;gap:8px');
+    var menu = el('div', 'display:none;background:#fff;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.18);padding:6px;min-width:210px');
+    menu.id = 'menuQR';
+    menu.setAttribute('role', 'menu');
+    var estiloItem = 'display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;text-align:left;padding:10px 12px;border-radius:10px;color:#1f4e79;font-weight:600;cursor:pointer;font-size:.92rem';
+    function item(texto, accion) {
+      var b = boton(texto, function () { cerrarMenu(); accion(); }, estiloItem);
+      b.setAttribute('role', 'menuitem');
+      b.addEventListener('mouseenter', function () { b.style.background = '#eef3f9'; });
+      b.addEventListener('mouseleave', function () { b.style.background = 'none'; });
+      menu.appendChild(b);
+    }
+    if (usuario.rol === 'familia' || usuario.rol === 'alumno') item('Credencial digital', verCredenciales);
+    item('Abrir en la app', abrirEnApp);
+    var fab = el('button', 'width:52px;height:52px;border:0;border-radius:50%;background:#1f4e79;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer');
+    fab.type = 'button';
+    fab.innerHTML = ICONO_QR.replace(/20/g, '26');
+    fab.title = 'Códigos QR: credencial y app';
+    fab.setAttribute('aria-label', 'Códigos QR: credencial digital y abrir en la app');
+    fab.setAttribute('aria-haspopup', 'menu');
+    fab.setAttribute('aria-expanded', 'false');
+    function cerrarMenu() { menu.style.display = 'none'; fab.setAttribute('aria-expanded', 'false'); }
+    fab.addEventListener('click', function (ev) {
+      ev.stopPropagation();
+      var abierto = menu.style.display === 'block';
+      menu.style.display = abierto ? 'none' : 'block';
+      fab.setAttribute('aria-expanded', String(!abierto));
+    });
+    document.addEventListener('click', function (ev) { if (!caja.contains(ev.target)) cerrarMenu(); });
+    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') cerrarMenu(); });
+    caja.appendChild(menu);
+    caja.appendChild(fab);
     document.body.appendChild(caja);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montar); else montar();

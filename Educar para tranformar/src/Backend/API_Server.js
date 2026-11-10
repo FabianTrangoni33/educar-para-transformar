@@ -24,6 +24,7 @@ const moduloMovil = require('./modulo-movil');
 const moduloPagos = require('./modulo-pagos');
 const moduloReportes = require('./modulo-reportes');
 const moduloQR = require('./modulo-qr');
+const moduloContacto = require('./modulo-contacto');
 const reglas = require('./reglas-negocio');
 const { notificarATodos } = require('./notificaciones');
 
@@ -2100,6 +2101,7 @@ moduloMovil.registrar(app);
 moduloPagos.registrar(app);
 moduloReportes.registrar(app);
 moduloQR.registrar(app);
+moduloContacto.registrar(app);
 
 // ─── 404 CATCH-ALL ──────────────────────────────────────────────────────────
 

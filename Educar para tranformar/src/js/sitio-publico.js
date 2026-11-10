@@ -97,6 +97,32 @@
     });
   }
 
+  // ── Contacto y consultas ──
+  var formCo = document.getElementById("formConsulta");
+  if (formCo) {
+    formCo.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var datos = {
+        nombre: document.getElementById("coNombre").value.trim(),
+        email: document.getElementById("coEmail").value.trim(),
+        telefono: document.getElementById("coTelefono").value.trim(),
+        motivo: document.getElementById("coMotivo").value,
+        mensaje: document.getElementById("coMensaje").value.trim()
+      };
+      if (!datos.nombre || !datos.email || !datos.mensaje) return alerta("coAlerta", false, "Completá nombre, correo y tu consulta.");
+      var boton = formCo.querySelector("[type=submit]");
+      boton.disabled = true;
+      pedir("/consultas", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(datos) })
+        .then(function (r) {
+          if (!r.ok) return alerta("coAlerta", false, r.error);
+          formCo.reset();
+          alerta("coAlerta", true, r.data.mensaje);
+        })
+        .catch(function () { alerta("coAlerta", false, "No se pudo enviar. Probá por WhatsApp."); })
+        .finally(function () { boton.disabled = false; });
+    });
+  }
+
   // ── Empleo ──
   var formEm = document.getElementById('formEmpleo');
   if (formEm) {

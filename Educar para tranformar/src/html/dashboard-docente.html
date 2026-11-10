@@ -174,7 +174,7 @@
                                                 <th>Código</th>
                                                 <th>Nombre de la Materia</th>
                                                 <th>Carga Horaria</th>
-                                                <th>Alumnos</th>
+                                                <th>Ciclo</th>
                                                 <th>Estado</th>
                                             </tr>
                                         </thead>
@@ -562,6 +562,10 @@
 </script>
 
 <!-- Script module: carga materias asignadas y gestiona la planilla de calificaciones desde PostgreSQL -->
+<script>
+    // El servidor devuelve 'Inicial', 'Primario' o 'Secundario': se normaliza para comparar
+    window.nivelNormalizado = (n) => { const t = String(n || '').toLowerCase(); return t.startsWith('ini') ? 'inicial' : t.startsWith('prim') ? 'primaria' : 'secundaria'; };
+</script>
 <script type="module">
     import {
         sincronizarConServidor,
@@ -1271,9 +1275,10 @@
                     </tr>`;
             } else {
                 tbody.innerHTML = materias.map(m => {
-                    const nivelBadge = m.nivel === 'inicial'
+                    const nivelM = nivelNormalizado(m.nivel);
+                    const nivelBadge = nivelM === 'inicial'
                         ? '<span class="badge bg-warning-subtle text-warning border border-warning-subtle">Inicial</span>'
-                        : m.nivel === 'primaria'
+                        : nivelM === 'primaria'
                             ? '<span class="badge bg-info-subtle text-info">Primaria</span>'
                             : '<span class="badge bg-secondary-subtle text-secondary">Secundaria</span>';
 
@@ -1301,8 +1306,8 @@
             window._alumnosDocenteCache = alumnosDocente;
 
             // Adaptar títulos de bienvenida según nivel pedagógico (Maestro/a vs Profesor/a)
-            const tieneInicial = materias.some(m => m.nivel === 'inicial');
-            const tienePrimaria = materias.some(m => m.nivel === 'primaria');
+            const tieneInicial = materias.some(m => nivelNormalizado(m.nivel) === 'inicial');
+            const tienePrimaria = materias.some(m => nivelNormalizado(m.nivel) === 'primaria');
             const rolDocenteTitulo = tieneInicial ? 'Maestra/o de Sala' : tienePrimaria ? 'Maestro/a de Grado' : 'Profesor/a';
             const saludoDocente = tieneInicial ? `Bienvenida/o, Maestra/o ${usuario.nombre}` : tienePrimaria ? `Bienvenido/a, Maestro/a ${usuario.nombre}` : `Bienvenido/a, Prof. ${usuario.nombre}`;
             

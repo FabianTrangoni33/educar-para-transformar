@@ -256,3 +256,15 @@ CREATE TABLE IF NOT EXISTS movimientos_alumno (
     creado_en        TIMESTAMPTZ DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_movimientos_alumno ON movimientos_alumno (id_alumno, creado_en);
+
+-- ─── Consultas desde la página web (modulo-contacto.js también la crea si falta) ───
+CREATE TABLE IF NOT EXISTS consultas_web (
+    id         SERIAL PRIMARY KEY,
+    nombre     VARCHAR(100) NOT NULL,
+    email      VARCHAR(120) NOT NULL,
+    telefono   VARCHAR(30),
+    motivo     VARCHAR(20) NOT NULL,
+    mensaje    TEXT NOT NULL,
+    atendida   BOOLEAN NOT NULL DEFAULT FALSE,
+    creado_en  TIMESTAMPTZ DEFAULT now()
+);

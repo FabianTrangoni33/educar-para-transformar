@@ -14,38 +14,50 @@
 </head>
 <body class="bg-light">
 
-    <nav id="mainNavbar" class="navbar navbar-expand-lg bg-white fixed-top shadow-sm py-3">
+    <nav id="mainNavbar" class="navbar navbar-expand-xl bg-white fixed-top shadow-sm py-2">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="index.html">
-                <img src="../img/logo.png" alt="Logo Fundación" width="46" height="46" class="img-fluid object-fit-contain">
-                <span class="text-primary fs-5 d-none d-sm-inline">Educar para <span class="text-warning">Transformar</span></span>
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold me-xl-4" href="index.html">
+                <img src="../img/logo.png" alt="Logo Educar para Transformar" width="44" height="44" class="object-fit-contain">
+                <span class="text-primary fs-5 d-none d-sm-inline text-nowrap">Educar para <span class="text-warning">Transformar</span></span>
             </a>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir menú">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto fw-medium">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="nivelesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Niveles
-                        </a>
-                        <ul class="dropdown-menu border-0 shadow-sm rounded-4" aria-labelledby="nivelesDropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Institución</a>
+                        <ul class="dropdown-menu border-0 shadow-sm rounded-4">
+                            <li><a class="dropdown-item py-2" href="index.html#quienes-somos">Quiénes somos</a></li>
+                            <li><a class="dropdown-item py-2" href="index.html#idiomas">Idiomas</a></li>
+                            <li><a class="dropdown-item py-2" href="index.html#instalaciones">Instalaciones y deportes</a></li>
+                            <li><a class="dropdown-item py-2" href="index.html#bienestar">Bienestar estudiantil</a></li>
+                            <li><a class="dropdown-item py-2" href="index.html#galeria">Galería</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Niveles</a>
+                        <ul class="dropdown-menu border-0 shadow-sm rounded-4">
                             <li><a class="dropdown-item py-2" href="inicial.html">Nivel Inicial</a></li>
                             <li><a class="dropdown-item py-2" href="primario.html">Nivel Primario</a></li>
                             <li><a class="dropdown-item py-2" href="secundario.html">Nivel Secundario</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="index.html#idiomas">Idiomas</a></li>
-                    <li class="nav-item"><a class="nav-link" href="index.html#instalaciones">Instalaciones</a></li>
-                    <li class="nav-item"><a class="nav-link" href="index.html#servicios">Servicios</a></li>
+                    <li class="nav-item"><a class="nav-link" href="noticias.html">Noticias</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Comunidad</a>
+                        <ul class="dropdown-menu border-0 shadow-sm rounded-4">
+                            <li><a class="dropdown-item py-2" href="index.html#opiniones">Opiniones</a></li>
+                            <li><a class="dropdown-item py-2" href="index.html#empleo">Trabajá con nosotros</a></li>
+                            <li><a class="dropdown-item py-2" href="index.html#consultas">Contacto y consultas</a></li>
+                        </ul>
+                    </li>
                 </ul>
-                <div class="d-flex flex-column flex-lg-row gap-2 mt-3 mt-lg-0">
-                    <a href="login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold custom-btn-hover d-flex align-items-center justify-content-center gap-2">
+                <div class="d-flex flex-column flex-xl-row gap-2 mt-3 mt-xl-0">
+                    <a href="login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold custom-btn-hover d-flex align-items-center justify-content-center gap-2 text-nowrap">
                         <span class="material-symbols-outlined fs-6">login</span> Ingresar
                     </a>
-                    <a href="preinscripcion.html" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm custom-btn-hover">
-                        Inscripciones 2027
-                    </a>
+                    <a href="preinscripcion.html" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm custom-btn-hover text-nowrap">Inscripciones 2027</a>
                 </div>
             </div>
         </div>
@@ -178,7 +190,7 @@
                         <li><a href="index.html#niveles">Niveles</a></li>
                         <li><a href="index.html#idiomas">Idiomas</a></li>
                         <li><a href="index.html#instalaciones">Instalaciones</a></li>
-                        <li><a href="index.html#servicios">Servicios</a></li>
+                        <li><a href="index.html#bienestar">Bienestar estudiantil</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4">

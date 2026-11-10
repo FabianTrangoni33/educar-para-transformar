@@ -125,3 +125,25 @@ body.bg-light {
         transform: translateY(0);
     }
 }
+/* ── Colores institucionales en los controles de Bootstrap del panel ── */
+.main-content .nav-pills .nav-link { color: var(--logo-primario); font-weight: 600; border-radius: 999px; }
+.main-content .nav-pills .nav-link:hover { background-color: rgba(11, 37, 69, 0.06); }
+.main-content .nav-pills .nav-link.active { background-color: var(--logo-primario); color: #fff; }
+.main-content .btn-primary { background-color: var(--logo-primario); border-color: var(--logo-primario); }
+.main-content .btn-primary:hover, .main-content .btn-primary:focus { background-color: #13365f; border-color: #13365f; }
+.main-content .btn-outline-primary { color: var(--logo-primario); border-color: var(--logo-primario); }
+.main-content .btn-outline-primary:hover { background-color: var(--logo-primario); color: #fff; }
+.main-content .form-control:focus, .main-content .form-select:focus { border-color: var(--logo-acento2); box-shadow: 0 0 0 0.2rem rgba(14, 165, 233, 0.15); }
+.main-content .table thead th { font-size: 0.85rem; text-transform: none; color: var(--text-dark); }
+.main-content a:not(.btn):not(.nav-link) { color: var(--logo-acento2); }
+@media print { .sidebar, .navbar-dashboard, .nav-pills { display: none !important; } }
+
+/* Barra superior de los paneles en celulares: sin desbordes */
+@media (max-width: 575.98px) {
+    .navbar-dashboard { padding-left: 1rem !important; padding-right: 1rem !important; gap: .5rem; }
+    .navbar-dashboard .badge.bg-primary-subtle { display: none !important; }
+    .navbar-dashboard .btn { white-space: nowrap; }
+    .navbar-dashboard .gap-3 { gap: .5rem !important; }
+    .navbar-dashboard .border-start { border-left: 0 !important; padding-left: 0 !important; }
+    .navbar-dashboard .ms-2 { margin-left: 0 !important; }
+}

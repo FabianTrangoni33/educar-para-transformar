@@ -92,7 +92,8 @@ const GALERIA = [
   ['gimnacio.jpg', 'Gimnasio cubierto'], ['comedor.jpg', 'Comedor'],
   ['laboratorio computacion.jpg', 'Laboratorio de computación'], ['Laboratorio quimica.jpg', 'Laboratorio de química'],
   ['jardin.jpg', 'Nivel Inicial'], ['Primaria1.jpg', 'Nivel Primario'], ['secundaria.jpg', 'Nivel Secundario'],
-  ['buses.jpg', 'Transporte escolar'], ['karate.jpg', 'Artes marciales']
+  ['buses.jpg', 'Transporte escolar'], ['karate.jpg', 'Artes marciales'],
+  ['Quimica.jpg', 'Laboratorio de ciencias'], ['ninosEstudiando.jpg', 'Apoyo estudiantil'], ['Niños felices.jpg', 'Vida escolar']
 ].map(([archivo, titulo]) => ({ titulo, ruta: `/img/${encodeURIComponent(archivo)}` }));
 
 function registrar(app) {

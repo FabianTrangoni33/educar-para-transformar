@@ -13,38 +13,50 @@
 </head>
 <body class="login-body">
 
-    <nav id="mainNavbar" class="navbar navbar-expand-lg bg-white fixed-top shadow-sm py-3">
+    <nav id="mainNavbar" class="navbar navbar-expand-xl bg-white fixed-top shadow-sm py-2">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="index.html">
-                <img src="../img/logo.png" alt="Logo Fundación" width="46" height="46" class="img-fluid object-fit-contain">
-                <span class="text-primary fs-5 d-none d-sm-inline">Educar para <span class="text-warning">Transformar</span></span>
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold me-xl-4" href="index.html">
+                <img src="../img/logo.png" alt="Logo Educar para Transformar" width="44" height="44" class="object-fit-contain">
+                <span class="text-primary fs-5 d-none d-sm-inline text-nowrap">Educar para <span class="text-warning">Transformar</span></span>
             </a>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir menú">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto fw-medium">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="nivelesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Niveles
-                        </a>
-                        <ul class="dropdown-menu border-0 shadow-sm rounded-4" aria-labelledby="nivelesDropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Institución</a>
+                        <ul class="dropdown-menu border-0 shadow-sm rounded-4">
+                            <li><a class="dropdown-item py-2" href="index.html#quienes-somos">Quiénes somos</a></li>
+                            <li><a class="dropdown-item py-2" href="index.html#idiomas">Idiomas</a></li>
+                            <li><a class="dropdown-item py-2" href="index.html#instalaciones">Instalaciones y deportes</a></li>
+                            <li><a class="dropdown-item py-2" href="index.html#bienestar">Bienestar estudiantil</a></li>
+                            <li><a class="dropdown-item py-2" href="index.html#galeria">Galería</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Niveles</a>
+                        <ul class="dropdown-menu border-0 shadow-sm rounded-4">
                             <li><a class="dropdown-item py-2" href="inicial.html">Nivel Inicial</a></li>
                             <li><a class="dropdown-item py-2" href="primario.html">Nivel Primario</a></li>
                             <li><a class="dropdown-item py-2" href="secundario.html">Nivel Secundario</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="index.html#idiomas">Idiomas</a></li>
-                    <li class="nav-item"><a class="nav-link" href="index.html#instalaciones">Instalaciones</a></li>
-                    <li class="nav-item"><a class="nav-link" href="index.html#servicios">Servicios</a></li>
+                    <li class="nav-item"><a class="nav-link" href="noticias.html">Noticias</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Comunidad</a>
+                        <ul class="dropdown-menu border-0 shadow-sm rounded-4">
+                            <li><a class="dropdown-item py-2" href="index.html#opiniones">Opiniones</a></li>
+                            <li><a class="dropdown-item py-2" href="index.html#empleo">Trabajá con nosotros</a></li>
+                            <li><a class="dropdown-item py-2" href="index.html#consultas">Contacto y consultas</a></li>
+                        </ul>
+                    </li>
                 </ul>
-                <div class="d-flex flex-column flex-lg-row gap-2 mt-3 mt-lg-0">
-                    <a href="login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold custom-btn-hover d-flex align-items-center justify-content-center gap-2">
+                <div class="d-flex flex-column flex-xl-row gap-2 mt-3 mt-xl-0">
+                    <a href="login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold custom-btn-hover d-flex align-items-center justify-content-center gap-2 text-nowrap">
                         <span class="material-symbols-outlined fs-6">login</span> Ingresar
                     </a>
-                    <a href="preinscripcion.html" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm custom-btn-hover">
-                        Inscripciones 2027
-                    </a>
+                    <a href="preinscripcion.html" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm custom-btn-hover text-nowrap">Inscripciones 2027</a>
                 </div>
             </div>
         </div>
@@ -156,7 +168,8 @@
                     loginTitle.innerText = "Portal del Alumno";
                     loginDesc.innerText = "Accede a tus calificaciones, material de estudio y comunicados docentes.";
                 } else if (selectedRole === 'docente') {
-                    subRoleContainer.style.display = 'flex';
+                    // Inicial, Primario o Secundario: el sistema lo detecta por las materias asignadas
+                    subRoleContainer.style.display = 'none';
                     imagePanel.style.backgroundImage = "linear-gradient(rgba(11, 37, 69, 0.85), rgba(11, 37, 69, 0.75)), url('../img/docente.jpg')";
                     loginTitle.innerText = "Portal Docente";
                     loginDesc.innerText = "Gestiona tus clases, asistencias, planeaciones y comunicación con las familias.";
@@ -191,7 +204,6 @@
             const rol      = document.querySelector('input[name="userRole"]:checked').value;
             const nivel    = document.querySelector('input[name="userLevel"]:checked')?.value || null;
             const email    = `${dni}@escuela.edu.ar`;
-            console.log('Intentando login con:', email, '| password length:', password.length);
 
             const btn = document.querySelector('[type="submit"]');
             btn.disabled = true;
@@ -220,13 +232,6 @@
                         const rolMap = { 'ESTUDIANTE': 'alumno', 'DOCENTE': 'docente', 'PADRE': 'familia', 'ADMIN': 'admin' };
                         const rolDetectado = rolMap[u.rol] || u.rol.toLowerCase();
 
-                        if (rolDetectado !== rol) {
-                            alert(`El rol seleccionado (${rol}) no coincide con el perfil del usuario (${rolDetectado}).`);
-                            btn.disabled = false;
-                            btn.textContent = 'Ingresar al Portal';
-                            return;
-                        }
-
                         // Guardar token JWT y sesión
                         localStorage.setItem('token', data.data.token);
                         localStorage.setItem('usuario', JSON.stringify({
@@ -236,14 +241,14 @@
                             nombre: u.nombre,
                             apellido: u.apellido,
                             rol: rolDetectado,
-                            nivel: nivel,
+                            nivel: rolDetectado === 'alumno' ? nivel : null,
                             edad: u.edad || null,
                             genero: u.genero || null
                         }));
 
-                        if (rol === 'alumno')  window.location.href = 'dashboard-alumno.html';
-                        if (rol === 'docente') window.location.href = 'dashboard-docente.html';
-                        if (rol === 'familia') window.location.href = 'dashboard-familia.html';
+                        // Cada usuario entra al portal de su rol real, aunque haya elegido otra tarjeta
+                        const PORTAL = { alumno: 'dashboard-alumno.html', docente: 'dashboard-docente.html', familia: 'dashboard-familia.html', admin: 'dashboard.html' };
+                        window.location.href = PORTAL[rolDetectado] || 'index.html';
                         return;
                     }
                 }
@@ -336,7 +341,7 @@
                         <li><a href="index.html#niveles">Niveles</a></li>
                         <li><a href="index.html#idiomas">Idiomas</a></li>
                         <li><a href="index.html#instalaciones">Instalaciones</a></li>
-                        <li><a href="index.html#servicios">Servicios</a></li>
+                        <li><a href="index.html#bienestar">Bienestar estudiantil</a></li>
                         <li class="mt-2 pt-2 border-top border-white border-opacity-25">
                             <a href="login-admin.html" class="text-white-50 small d-inline-flex align-items-center gap-1 text-decoration-none hover-white">
                                 <span class="material-symbols-outlined fs-6">admin_panel_settings</span> Acceso Administrativo

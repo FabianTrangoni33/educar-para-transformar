@@ -68,8 +68,38 @@ body {
     transform: translateX(-50%); 
     border-radius: 2px;
 }
-.navbar-nav .nav-link:hover::after { 
-    width: 100%; 
+.navbar-nav .nav-link:hover::after {
+    width: 100%;
+}
+.navbar-nav .nav-link.active { color: var(--logo-acento) !important; }
+
+/* Los desplegables usan ::after para la flecha de Bootstrap: no se pisa con el subrayado animado */
+.navbar-nav .nav-link.dropdown-toggle::after,
+.navbar-nav .nav-link.dropdown-toggle:hover::after {
+    position: static;
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 0.35em;
+    vertical-align: 0.2em;
+    background: none;
+    transform: none;
+    border-radius: 0;
+    border-top: 0.32em solid;
+    border-right: 0.32em solid transparent;
+    border-left: 0.32em solid transparent;
+    border-bottom: 0;
+}
+@media (max-width: 1199.98px) {
+    .navbar-nav .nav-link { margin: 0; padding: 0.6rem 0; }
+    .navbar-nav .nav-link::after { display: none; }
+    .navbar-nav .nav-link.dropdown-toggle::after { display: inline-block; }
+}
+.dropdown-item.active, .dropdown-item:active { background-color: var(--logo-acento); color: #fff; }
+
+/* Usuarios que prefieren menos movimiento: el contenido aparece sin animación */
+@media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
 }
 
 /* Menú Desplegable (Dropdown) */

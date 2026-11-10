@@ -64,8 +64,7 @@
                 </div>
 
                 <div class="sidebar-heading mt-3">Gestión</div>
-                <li class="nav-item"><a class="nav-link" href="#"><span class="material-symbols-outlined me-2">payments</span> Estado de Cuenta</a></li>
-                <li class="nav-item"><a class="nav-link" href="#"><span class="material-symbols-outlined me-2">mail</span> Mensajes <span class="badge bg-danger ms-2">1</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="#estadoCuenta"><span class="material-symbols-outlined me-2">payments</span> Estado de Cuenta</a></li>
             </ul>
         </aside>
 
@@ -127,12 +126,12 @@
                         </div>
                     </div>
                     <div class="col-md-4 dash-reveal delay-200">
-                        <div class="card card-dash p-4 bg-white border-0 shadow-sm text-center h-100">
+                        <div id="estadoCuenta" class="card card-dash p-4 bg-white border-0 shadow-sm text-center h-100">
                             <h6 class="text-muted text-uppercase small fw-bold mb-3">Estado de Aranceles</h6>
-                            <span class="material-symbols-outlined display-1 text-success mb-2">check_circle</span>
-                            <h4 class="fw-bold text-dark">Cuota al Día</h4>
-                            <p class="text-secondary small">Próximo vencimiento: 1 al 10 del mes siguiente.</p>
-                            <button class="btn btn-outline-primary rounded-pill w-100 mt-2">Ver Comprobantes</button>
+                            <span id="icoCuenta" class="material-symbols-outlined display-1 text-secondary mb-2">hourglass_empty</span>
+                            <h4 id="titCuenta" class="fw-bold text-dark">Consultando...</h4>
+                            <p id="detCuenta" class="text-secondary small">Vencimiento: del 1 al 10 de cada mes.</p>
+                            <button id="btnPagarApp" type="button" class="btn btn-outline-primary rounded-pill w-100 mt-2">Pagar y subir comprobantes en la app</button>
                         </div>
                     </div>
                 </div>
@@ -300,5 +299,36 @@
     });
 </script>
 <script src="../js/qr-sesion.js"></script>
+<script>
+    // Estado de cuenta real (mismo dato que el inicio de la app: GET /api/movil/pagos/resumen)
+    (async () => {
+        const ico = document.getElementById('icoCuenta'), tit = document.getElementById('titCuenta'), det = document.getElementById('detCuenta');
+        document.getElementById('btnPagarApp').addEventListener('click', () => window.QRSesion && window.QRSesion.abrirEnApp());
+        const pesos = (n) => '$ ' + Number(n).toLocaleString('es-AR', { maximumFractionDigits: 2 });
+        try {
+            const r = await fetch(`${API_BASE}/movil/pagos/resumen`, { headers: { Authorization: 'Bearer ' + (localStorage.getItem('token') || '') } });
+            const j = await r.json();
+            if (!j.ok) throw new Error(j.error);
+            const saldo = j.data.reduce((t, h) => t + Number(h.saldo || 0), 0);
+            const vencidas = j.data.reduce((t, h) => t + Number(h.vencidas || 0), 0);
+            const prox = j.data.map(h => h.proximo_vencimiento).filter(Boolean).sort()[0];
+            if (!saldo) {
+                ico.textContent = 'check_circle';
+                ico.className = 'material-symbols-outlined display-1 text-success mb-2';
+                tit.textContent = 'Cuota al día';
+                det.textContent = 'No tenés saldos pendientes. Vencimiento: del 1 al 10 de cada mes.';
+            } else {
+                ico.textContent = vencidas ? 'error' : 'schedule';
+                ico.className = 'material-symbols-outlined display-1 mb-2 ' + (vencidas ? 'text-danger' : 'text-warning');
+                tit.textContent = 'Saldo pendiente: ' + pesos(saldo);
+                det.textContent = (vencidas ? vencidas + ' cuota(s) vencida(s). ' : '') + (prox ? 'Próximo vencimiento: ' + new Date(prox).toLocaleDateString('es-AR') + '.' : '');
+            }
+        } catch (e) {
+            ico.textContent = 'info';
+            tit.textContent = 'Estado no disponible';
+            det.textContent = 'No se pudo consultar el estado de cuenta. Probá de nuevo más tarde.';
+        }
+    })();
+</script>
 </body>
 </html>

@@ -64,6 +64,8 @@
                                 <option value="comedor">Alumnos inscriptos al comedor</option>
                                 <option value="asistencia">Asistencia diaria por curso (credencial QR)</option>
                                 <option value="auditoria">Auditoría de operaciones (web / app)</option>
+                                <option value="consultas">Consultas recibidas desde el sitio web</option>
+                                <option value="postulaciones">Postulaciones laborales (Trabajá con nosotros)</option>
                             </select>
                         </div>
                         <div class="col-md-3 filtro" data-para="alumno"><label class="form-label small mb-1" for="fAlumno">Alumno</label><select id="fAlumno" class="form-select form-select-sm"></select></div>
@@ -161,7 +163,14 @@
             { titulo: 'Sube al micro', campo: 'sube_micro' }, { titulo: 'Baja del micro', campo: 'baja_micro' }] },
         auditoria: { ruta: () => '/reportes/auditoria', columnas: [
             { titulo: 'Fecha', valor: (f) => P.fechaHora(f.creado_en) }, { titulo: 'Usuario', campo: 'email' }, { titulo: 'Acción', campo: 'accion' },
-            { titulo: 'Origen', campo: 'origen' }, { titulo: 'Detalle', valor: (f) => (f.detalle ? JSON.stringify(f.detalle) : '') }] }
+            { titulo: 'Origen', campo: 'origen' }, { titulo: 'Detalle', valor: (f) => (f.detalle ? JSON.stringify(f.detalle) : '') }] },
+        consultas: { ruta: () => '/consultas', columnas: [
+            { titulo: 'Fecha', valor: (f) => P.fechaHora(f.creado_en) }, { titulo: 'Nombre', campo: 'nombre' }, { titulo: 'Correo', campo: 'email' },
+            { titulo: 'Teléfono', campo: 'telefono' }, { titulo: 'Motivo', campo: 'motivo' }, { titulo: 'Consulta', campo: 'mensaje' },
+            { titulo: 'Estado', valor: (f) => (f.atendida ? 'Atendida' : 'Pendiente') }] },
+        postulaciones: { ruta: () => '/empleo', columnas: [
+            { titulo: 'Fecha', valor: (f) => P.fechaHora(f.creado_en) }, { titulo: 'Nombre', campo: 'nombre' }, { titulo: 'Correo', campo: 'email' },
+            { titulo: 'Teléfono', campo: 'telefono' }, { titulo: 'Puesto', campo: 'puesto' }, { titulo: 'Mensaje', campo: 'mensaje' }] }
     };
     function q(obj) {
         const p = new URLSearchParams();

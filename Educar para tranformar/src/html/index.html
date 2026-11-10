@@ -14,41 +14,50 @@
 
     
 
-    <nav id="mainNavbar" class="navbar navbar-expand-lg bg-white fixed-top shadow-sm py-3">
+    <nav id="mainNavbar" class="navbar navbar-expand-xl bg-white fixed-top shadow-sm py-2">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="index.html">
-                <img src="../img/logo.png" alt="Logo Fundación" width="46" height="46" class="img-fluid object-fit-contain">
-                <span class="text-primary fs-5 d-none d-sm-inline">Educar para <span class="text-warning">Transformar</span></span>
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold me-xl-4" href="index.html">
+                <img src="../img/logo.png" alt="Logo Educar para Transformar" width="44" height="44" class="object-fit-contain">
+                <span class="text-primary fs-5 d-none d-sm-inline text-nowrap">Educar para <span class="text-warning">Transformar</span></span>
             </a>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir menú">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto fw-medium">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="nivelesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Niveles
-                        </a>
-                        <ul class="dropdown-menu border-0 shadow-sm rounded-4" aria-labelledby="nivelesDropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Institución</a>
+                        <ul class="dropdown-menu border-0 shadow-sm rounded-4">
+                            <li><a class="dropdown-item py-2" href="#quienes-somos">Quiénes somos</a></li>
+                            <li><a class="dropdown-item py-2" href="#idiomas">Idiomas</a></li>
+                            <li><a class="dropdown-item py-2" href="#instalaciones">Instalaciones y deportes</a></li>
+                            <li><a class="dropdown-item py-2" href="#bienestar">Bienestar estudiantil</a></li>
+                            <li><a class="dropdown-item py-2" href="#galeria">Galería</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Niveles</a>
+                        <ul class="dropdown-menu border-0 shadow-sm rounded-4">
                             <li><a class="dropdown-item py-2" href="inicial.html">Nivel Inicial</a></li>
                             <li><a class="dropdown-item py-2" href="primario.html">Nivel Primario</a></li>
                             <li><a class="dropdown-item py-2" href="secundario.html">Nivel Secundario</a></li>
                         </ul>
                     </li>
                     <li class="nav-item"><a class="nav-link" href="noticias.html">Noticias</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#instalaciones">Instalaciones</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#galeria">Galería</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#opiniones">Opiniones</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#empleo">Empleo</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Comunidad</a>
+                        <ul class="dropdown-menu border-0 shadow-sm rounded-4">
+                            <li><a class="dropdown-item py-2" href="#opiniones">Opiniones</a></li>
+                            <li><a class="dropdown-item py-2" href="#empleo">Trabajá con nosotros</a></li>
+                            <li><a class="dropdown-item py-2" href="#consultas">Contacto y consultas</a></li>
+                        </ul>
+                    </li>
                 </ul>
-                <div class="d-flex flex-column flex-lg-row gap-2 mt-3 mt-lg-0">
-                    <a href="login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold custom-btn-hover d-flex align-items-center justify-content-center gap-2">
+                <div class="d-flex flex-column flex-xl-row gap-2 mt-3 mt-xl-0">
+                    <a href="login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold custom-btn-hover d-flex align-items-center justify-content-center gap-2 text-nowrap">
                         <span class="material-symbols-outlined fs-6">login</span> Ingresar
                     </a>
-                    <a href="preinscripcion.html" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm custom-btn-hover">
-                        Inscripciones 2027
-                    </a>
+                    <a href="preinscripcion.html" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm custom-btn-hover text-nowrap">Inscripciones 2027</a>
                 </div>
             </div>
         </div>
@@ -77,6 +86,34 @@
         </div>
     </section>
     
+
+    <!-- Quiénes somos -->
+    <section id="quienes-somos" class="py-5 bg-white">
+        <div class="container py-4">
+            <div class="row g-4 g-lg-5 align-items-center">
+                <div class="col-lg-6 reveal">
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 mb-3">Quiénes somos</span>
+                    <h2 class="fw-bold text-dark display-6 mb-3">Una escuela pensada para transformar</h2>
+                    <p class="text-secondary">Somos una institución educativa de gestión privada ubicada en las afueras de Resistencia, Chaco, que inicia sus actividades en <strong>marzo de 2027</strong>. Ofrecemos Nivel Inicial, Primario y Secundario con <strong>jornada extendida</strong>, idiomas, deportes y servicios integrales para acompañar a cada familia.</p>
+                    <div class="row g-3 mt-2">
+                        <div class="col-sm-4"><div class="p-3 rounded-4 bg-light h-100"><span class="material-symbols-outlined text-primary">flag</span><h3 class="h6 fw-bold mt-2 mb-1">Misión</h3><p class="small text-secondary mb-0">Formar personas íntegras, críticas y creativas, comprometidas con su comunidad.</p></div></div>
+                        <div class="col-sm-4"><div class="p-3 rounded-4 bg-light h-100"><span class="material-symbols-outlined text-warning">visibility</span><h3 class="h6 fw-bold mt-2 mb-1">Visión</h3><p class="small text-secondary mb-0">Ser una escuela de referencia regional en calidad educativa e innovación.</p></div></div>
+                        <div class="col-sm-4"><div class="p-3 rounded-4 bg-light h-100"><span class="material-symbols-outlined text-success">volunteer_activism</span><h3 class="h6 fw-bold mt-2 mb-1">Valores</h3><p class="small text-secondary mb-0">Respeto, esfuerzo, inclusión, honestidad y trabajo en equipo.</p></div></div>
+                    </div>
+                </div>
+                <div class="col-lg-6 reveal delay-200">
+                    <div class="position-relative">
+                        <img src="../img/portada3.jpg" alt="Estudiantes en el campus" class="img-fluid rounded-4 shadow w-100" style="aspect-ratio: 4 / 3; object-fit: cover;" loading="lazy">
+                        <div class="position-absolute bottom-0 start-0 m-3 bg-white rounded-4 shadow-sm px-3 py-2 d-flex gap-4">
+                            <div><div class="fw-bold fs-4 text-primary">3</div><small class="text-secondary">Niveles</small></div>
+                            <div><div class="fw-bold fs-4 text-primary">8</div><small class="text-secondary">Deportes</small></div>
+                            <div><div class="fw-bold fs-4 text-primary">3</div><small class="text-secondary">Idiomas</small></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <section id="niveles" class="py-5 bg-light">
         <div class="container py-5">
@@ -271,31 +308,39 @@
         </div>
     </section>
 
-    <section id="servicios" class="py-5 bg-soft-orange">
+    <section id="bienestar" class="py-5 bg-soft-orange">
         <div class="container py-5 text-center">
             <div class="reveal">
-                <h2 class="fw-bold text-dark mb-5 display-6 section-heading">Servicios de Cuidado Integral</h2>
+                <h2 class="fw-bold text-dark mb-3 display-6 section-heading">Bienestar Estudiantil</h2>
+                <p class="text-secondary mb-5">Servicios que acompañan a cada estudiante durante toda la jornada extendida.</p>
             </div>
             <div class="row g-4 justify-content-center">
-                <div class="col-md-4 col-sm-6 reveal delay-100">
+                <div class="col-lg-3 col-sm-6 reveal delay-100">
                     <div class="bg-white p-4 rounded-4 shadow-sm border border-light-subtle h-100 custom-hover-card">
                         <span class="material-symbols-outlined display-4 text-warning mb-3">restaurant</span>
                         <h4 class="fw-bold text-dark">Comedor Nutricional</h4>
                         <p class="text-secondary small mb-0">Planes alimentarios balanceados diseñados y supervisados por especialistas de la salud escolar.</p>
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-6 reveal delay-200">
+                <div class="col-lg-3 col-sm-6 reveal delay-200">
                     <div class="bg-white p-4 rounded-4 shadow-sm border border-light-subtle h-100 custom-hover-card">
                         <span class="material-symbols-outlined display-4 text-info mb-3">medical_services</span>
                         <h4 class="fw-bold text-dark">Enfermería</h4>
                         <p class="text-secondary small mb-0">Atención médica primaria inmediata y control preventivo constante dentro del campus.</p>
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-6 reveal delay-300">
+                <div class="col-lg-3 col-sm-6 reveal delay-300">
                     <div class="bg-white p-4 rounded-4 shadow-sm border border-light-subtle h-100 custom-hover-card">
                         <span class="material-symbols-outlined display-4 text-primary mb-3">directions_bus</span>
                         <h4 class="fw-bold text-dark">Micros Seguros</h4>
                         <p class="text-secondary small mb-0">Flota con geolocalización y choferes matriculados para la cobertura de rutas de traslado.</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 reveal delay-300">
+                    <div class="bg-white p-4 rounded-4 shadow-sm border border-light-subtle h-100 custom-hover-card">
+                        <span class="material-symbols-outlined display-4 text-success mb-3">psychology</span>
+                        <h4 class="fw-bold text-dark">Apoyo Estudiantil</h4>
+                        <p class="text-secondary small mb-0">Gabinete psicopedagógico y tutorías para acompañar las trayectorias escolares.</p>
                     </div>
                 </div>
             </div>
@@ -371,6 +416,47 @@
                 <div id="emAlerta" class="alert d-none mt-3" role="alert"></div>
                 <button class="btn btn-warning rounded-pill px-4 fw-bold mt-3" type="submit">Enviar postulación</button>
             </form>
+        </div>
+    </section>
+
+    <!-- Contacto y consultas desde la web (POST /api/consultas) -->
+    <section id="consultas" class="py-5 bg-soft-blue">
+        <div class="container py-4">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-dark display-6 section-heading">Contacto y consultas</h2>
+                <p class="text-secondary mt-3">Escribinos por este formulario, por WhatsApp o en nuestras redes.</p>
+            </div>
+            <div class="row g-4 justify-content-center">
+                <div class="col-lg-7">
+                    <form id="formConsulta" class="bg-white p-4 rounded-4 shadow-sm" novalidate>
+                        <div class="row g-3">
+                            <div class="col-md-6"><label class="form-label small fw-bold" for="coNombre">Nombre y apellido</label><input id="coNombre" class="form-control" maxlength="100" required autocomplete="name"></div>
+                            <div class="col-md-6"><label class="form-label small fw-bold" for="coEmail">Correo electrónico</label><input id="coEmail" type="email" class="form-control" maxlength="120" required autocomplete="email"></div>
+                            <div class="col-md-6"><label class="form-label small fw-bold" for="coTelefono">Teléfono (opcional)</label><input id="coTelefono" type="tel" class="form-control" maxlength="30" autocomplete="tel"></div>
+                            <div class="col-md-6"><label class="form-label small fw-bold" for="coMotivo">Motivo</label>
+                                <select id="coMotivo" class="form-select">
+                                    <option value="INSCRIPCIONES">Inscripciones 2027</option>
+                                    <option value="INFORMACION">Información general</option>
+                                    <option value="CUOTAS">Cuotas y pagos</option>
+                                    <option value="TRANSPORTE">Transporte escolar</option>
+                                    <option value="OTRO">Otro</option>
+                                </select></div>
+                            <div class="col-12"><label class="form-label small fw-bold" for="coMensaje">Tu consulta</label><textarea id="coMensaje" class="form-control" rows="4" maxlength="2000" required></textarea></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold mt-3">Enviar consulta</button>
+                        <div id="coAlerta" class="d-none" role="status"></div>
+                    </form>
+                </div>
+                <div class="col-lg-4">
+                    <div class="bg-white p-4 rounded-4 shadow-sm h-100">
+                        <h3 class="h6 fw-bold mb-3">Otros canales</h3>
+                        <a id="coWhatsapp" href="https://wa.me/543624781240" target="_blank" rel="noopener" class="btn btn-success rounded-pill w-100 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2"><span class="material-symbols-outlined fs-5">chat</span> Escribir por WhatsApp</a>
+                        <p class="small text-secondary mb-2 d-flex gap-2"><span class="material-symbols-outlined fs-6 text-primary">mail</span> info@educarparatransformar.edu.ar</p>
+                        <p class="small text-secondary mb-2 d-flex gap-2"><span class="material-symbols-outlined fs-6 text-primary">location_on</span> Resistencia, Chaco, Argentina</p>
+                        <p class="small text-secondary mb-0 d-flex gap-2"><span class="material-symbols-outlined fs-6 text-primary">schedule</span> Secretaría: lunes a viernes de 7:30 a 17:00</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

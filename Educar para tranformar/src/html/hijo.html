@@ -73,13 +73,13 @@
             border: 1px solid transparent;
         }
         .nav-tutor-pills .nav-link:hover {
-            color: #0d6efd;
+            color: #0b2545;
             background: #f1f5f9;
         }
         .nav-tutor-pills .nav-link.active {
-            background: #0d6efd;
+            background: #0b2545;
             color: #ffffff;
-            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+            box-shadow: 0 4px 12px rgba(11, 37, 69, 0.25);
         }
 
         /* ── Tarjetas de Servicios y Materias ── */
@@ -198,10 +198,7 @@
 
                 <div class="sidebar-heading mt-3">Gestión</div>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><span class="material-symbols-outlined me-2">payments</span> Estado de Cuenta</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#"><span class="material-symbols-outlined me-2">mail</span> Mensajes <span class="badge bg-danger ms-2">1</span></a>
+                    <a class="nav-link" href="dashboard-familia.html#estadoCuenta"><span class="material-symbols-outlined me-2">payments</span> Estado de Cuenta</a>
                 </li>
             </ul>
         </aside>
@@ -212,7 +209,7 @@
             <nav class="navbar-dashboard bg-white shadow-sm px-4 py-3 d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-2">
                     <a href="dashboard-familia.html" class="btn btn-outline-primary btn-sm rounded-pill fw-bold d-inline-flex align-items-center gap-1 me-2 btn-no-print">
-                        <span class="material-symbols-outlined fs-6">arrow_back</span> Volver a Portal Familia
+                        <span class="material-symbols-outlined fs-6">arrow_back</span> Volver<span class="d-none d-md-inline">&nbsp;a Portal Familia</span>
                     </a>
                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-bold">
                         <span class="material-symbols-outlined fs-6 align-middle me-1">calendar_today</span> Ciclo Lectivo Oficial
@@ -425,6 +422,22 @@
                                             <div class="spinner-border spinner-border-sm text-success me-2"></div>
                                             Consultando ruta de transporte...
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Comedor escolar (misma API que la app móvil) -->
+                            <div class="col-12">
+                                <div class="card service-card p-4 shadow-sm">
+                                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="sport-badge-icon bg-warning text-white"><span class="material-symbols-outlined">restaurant</span></div>
+                                            <div>
+                                                <h5 class="fw-bold text-dark mb-0">Comedor Escolar</h5>
+                                                <small id="txtComedor" class="text-muted">Consultando inscripción...</small>
+                                            </div>
+                                        </div>
+                                        <button id="btnComedor" type="button" class="btn btn-sm btn-outline-warning rounded-pill px-3 fw-bold d-none"></button>
                                     </div>
                                 </div>
                             </div>
@@ -844,6 +857,46 @@ function renderTransporteActivo() {
         </div>`;
 }
 
+// ── Comedor escolar: usa la misma API que la app (/api/movil/alumnos/:id/comedor) ──
+async function apiComedor(metodo, ruta, cuerpo) {
+    const res = await fetch(`${API_BASE}${ruta}`, {
+        method: metodo,
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
+        body: cuerpo ? JSON.stringify(cuerpo) : undefined
+    });
+    const j = await res.json();
+    if (!j.ok) throw new Error(j.error || 'No se pudo completar la operación.');
+    return j.data;
+}
+async function cargarComedor() {
+    const txt = document.getElementById('txtComedor');
+    const btn = document.getElementById('btnComedor');
+    if (!txt || !ALUMNO_ID) return;
+    try {
+        const r = await apiComedor('GET', `/movil/alumnos/${ALUMNO_ID}/resumen`);
+        const c = r.comedor;
+        txt.textContent = c
+            ? `Inscripto desde el ${new Date(c.fecha_inscripcion).toLocaleDateString('es-AR')}${c.precio ? ` · $ ${Number(c.precio).toLocaleString('es-AR')} por mes` : ''}`
+            : 'No inscripto. Almuerzo diario con menú supervisado por nutricionistas.';
+        btn.textContent = c ? 'Dar de baja' : 'Inscribir al comedor';
+        btn.className = `btn btn-sm rounded-pill px-3 fw-bold ${c ? 'btn-outline-danger' : 'btn-warning'}`;
+        btn.onclick = async () => {
+            if (c && !confirm('¿Dar de baja la inscripción al comedor?')) return;
+            btn.disabled = true;
+            try {
+                const res = c ? await apiComedor('DELETE', `/movil/alumnos/${ALUMNO_ID}/comedor`)
+                              : await apiComedor('PUT', `/movil/alumnos/${ALUMNO_ID}/comedor`, { modalidad: 'ALMUERZO' });
+                mostrarToast(res.mensaje, 'success');
+                await cargarComedor();
+            } catch (e) { mostrarToast(e.message, 'danger'); }
+            finally { btn.disabled = false; }
+        };
+    } catch (e) {
+        txt.textContent = 'No se pudo consultar el comedor. Volvé a iniciar sesión si el problema sigue.';
+        btn.className = 'd-none';
+    }
+}
+
 // ── Render: Catálogo de Rutas en Modal ────────────────────────────────────────
 function renderCatalogoTransporte() {
     const rutaActualId = getRutaAlumno(ALUMNO_ID);
@@ -1195,6 +1248,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await sincronizarServiciosAlumno(ALUMNO_ID);
     renderDeportesActivos();
     renderTransporteActivo();
+    cargarComedor();
 
     // 5. Cargar boletín de calificaciones
     await cargarBoletinOficial();
