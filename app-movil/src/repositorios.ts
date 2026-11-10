@@ -6,7 +6,7 @@
 import { api } from './nucleo/apiClient';
 import type {
   Perfil, ResumenAlumno, Deporte, Recorrido, DatosDocente, Factura, DetalleFactura, Deuda,
-  ResumenPagoHijo, Notificacion, Noticia, Opinion
+  ResumenPagoHijo, Notificacion, Noticia, Opinion, Credencial, TipoMovimiento, ResultadoMovimiento
 } from './modelos';
 
 const num = (v: unknown) => (v == null ? 0 : Number(v));
@@ -80,4 +80,15 @@ export const institucionalRepo = {
   opiniones: () => api.get<{ opiniones: Opinion[]; promedio: number | null; total: number }>('/opiniones', false),
   opinar: (nombre: string, comentario: string, calificacion: number) =>
     api.post<{ mensaje: string }>('/opiniones', { nombre, comentario, calificacion }, false)
+};
+
+/** Valor agregado (TP1 punto 5): login con QR entre web y app, credencial digital y registro de ingresos. */
+export const qrRepo = {
+  /** La app (logueada) autoriza el QR que muestra la web */
+  aprobarWeb: (codigo: string) => api.post<{ mensaje: string }>('/qr-login/web/aprobar', { codigo }),
+  /** La app (sin sesión) entra con el QR que genera la web logueada */
+  canjearApp: (codigo: string) =>
+    api.post<{ token: string; refresh_token: string; usuario: { rol: string } }>('/qr-login/app/canjear', { codigo }, false),
+  credenciales: () => api.get<Credencial[]>('/movil/credenciales'),
+  registrarMovimiento: (qr: string, tipo: TipoMovimiento) => api.post<ResultadoMovimiento>('/movil/movimientos', { qr, tipo })
 };

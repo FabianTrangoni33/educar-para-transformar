@@ -4,8 +4,9 @@
  *
  *  Sin sesión  → Inicio · Noticias · Galería · Opinar · Ingresar
  *  Padre       → Mis hijos · Inscripciones · Cuotas · Avisos · Perfil
- *  Estudiante  → Mis datos · Avisos · Perfil
- *  Docente     → Mis cursos · Avisos · Perfil
+ *  Estudiante  → Mis datos · Credencial · Avisos · Perfil
+ *  Docente     → Mis cursos · Portería (escáner QR) · Avisos · Perfil
+ *  Admin       → acceso a la web + escáner de portería
  */
 import React, { useEffect } from 'react';
 import { Linking, Text, View } from 'react-native';
@@ -25,6 +26,7 @@ import { PantallaCuotas, PantallaFactura, PantallaPagar } from './modulos/pagos/
 import { PantallaDocente } from './modulos/docentes/pantallas';
 import { PantallaAvisos } from './modulos/notificaciones/pantallas';
 import { escucharToques } from './modulos/notificaciones/push';
+import { PantallaCredencial, PantallaEscaner } from './modulos/qr/pantallas';
 
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
@@ -92,6 +94,7 @@ function TabsEstudiante() {
   return (
     <Tabs.Navigator>
       <Tabs.Screen name="MisDatos" component={PantallaAlumno} options={opcionesTabs('school-outline', 'Mis datos')} />
+      <Tabs.Screen name="CredencialTab" component={PantallaCredencial} options={opcionesTabs('qr-code-outline', 'Credencial')} />
       <Tabs.Screen name="Avisos" component={PantallaAvisos} options={opcionesTabs('notifications-outline', 'Avisos')} />
       <Tabs.Screen name="Perfil" component={PantallaPerfil} options={opcionesTabs('person-circle-outline', 'Perfil')} />
     </Tabs.Navigator>
@@ -103,6 +106,7 @@ function TabsDocente() {
   return (
     <Tabs.Navigator>
       <Tabs.Screen name="MisCursos" component={PantallaDocente} options={opcionesTabs('briefcase-outline', 'Mis cursos')} />
+      <Tabs.Screen name="Porteria" component={PantallaEscaner} initialParams={{ modo: 'porteria' }} options={opcionesTabs('scan-outline', 'Portería')} />
       <Tabs.Screen name="Avisos" component={PantallaAvisos} options={opcionesTabs('notifications-outline', 'Avisos')} />
       <Tabs.Screen name="Perfil" component={PantallaPerfil} options={opcionesTabs('person-circle-outline', 'Perfil')} />
     </Tabs.Navigator>
@@ -110,7 +114,7 @@ function TabsDocente() {
 }
 
 // ── Administrador: opera solo desde la web ──
-function PantallaSoloWeb() {
+function PantallaSoloWeb({ navigation }: any) {
   const { salir } = useSesion();
   return (
     <View style={[s.pantalla, s.centro]}>
@@ -118,13 +122,15 @@ function PantallaSoloWeb() {
       <Text style={[s.titulo, { textAlign: 'center', marginVertical: 12 }]}>El rol Administrador usa el sistema web</Text>
       <Text style={[s.textoSuave, { textAlign: 'center', marginBottom: 16 }]}>ABM, reportes, tarifas y revisión de pagos se gestionan desde el panel web.</Text>
       <Boton texto="Abrir el sistema web" icono="open-outline" alPresionar={() => Linking.openURL(`${config.origen}/html/login-admin.html`)} estilo={{ alignSelf: 'stretch' }} />
+      <Boton texto="Registrar ingresos (portería)" icono="scan-outline" variante="secundario" alPresionar={() => navigation.navigate('Escaner', { modo: 'porteria' })} estilo={{ alignSelf: 'stretch' }} />
+      <Boton texto="Iniciar sesión en la web con QR" icono="qr-code-outline" variante="secundario" alPresionar={() => navigation.navigate('Escaner', { modo: 'autorizar-web' })} estilo={{ alignSelf: 'stretch' }} />
       <Boton texto="Cerrar sesión" variante="texto" alPresionar={() => salir()} />
     </View>
   );
 }
 
 const PANTALLA_DE_AVISO: Record<string, string> = {
-  cuotas: 'CuotasTab', deportes: 'Inscripciones', transporte: 'Inscripciones', comedor: 'Inscripciones', noticias: 'Noticias'
+  credencial: 'Credencial', cuotas: 'CuotasTab', deportes: 'Inscripciones', transporte: 'Inscripciones', comedor: 'Inscripciones', noticias: 'Noticias'
 };
 
 export function Navegacion() {
@@ -149,6 +155,7 @@ export function Navegacion() {
           <>
             <Stack.Screen name="Publico" component={TabsPublicas} options={{ headerShown: false }} />
             <Stack.Screen name="Recuperar" component={PantallaRecuperar} options={{ title: 'Recuperar contraseña' }} />
+            <Stack.Screen name="EscanerIngreso" component={PantallaEscaner} initialParams={{ modo: 'ingresar' }} options={{ title: 'Ingresar con QR' }} />
           </>
         ) : estado === 'bloqueado' ? (
           <Stack.Screen name="Bloqueo" component={PantallaBloqueo} options={{ headerShown: false }} />
@@ -160,6 +167,9 @@ export function Navegacion() {
             <Stack.Screen name="Noticias" component={PantallaNoticias} options={{ title: 'Noticias' }} />
             <Stack.Screen name="Galeria" component={PantallaGaleria} options={{ title: 'Galería' }} />
             <Stack.Screen name="Opinar" component={PantallaOpinar} options={{ title: 'Opiniones' }} />
+            {/* Valor agregado: credencial digital y escáner QR */}
+            <Stack.Screen name="Credencial" component={PantallaCredencial} options={{ title: 'Credencial digital' }} />
+            <Stack.Screen name="Escaner" component={PantallaEscaner} options={({ route }: any) => ({ title: route.params?.modo === 'autorizar-web' ? 'Ingresar en la web' : 'Portería' })} />
           </>
         )}
       </Stack.Navigator>

@@ -23,6 +23,7 @@ const { verificarToken, permitirRoles } = require('./authMiddleware');
 const moduloMovil = require('./modulo-movil');
 const moduloPagos = require('./modulo-pagos');
 const moduloReportes = require('./modulo-reportes');
+const moduloQR = require('./modulo-qr');
 const reglas = require('./reglas-negocio');
 const { notificarATodos } = require('./notificaciones');
 
@@ -2098,6 +2099,7 @@ app.delete('/api/noticias/:id', async (req, res) => {
 moduloMovil.registrar(app);
 moduloPagos.registrar(app);
 moduloReportes.registrar(app);
+moduloQR.registrar(app);
 
 // ─── 404 CATCH-ALL ──────────────────────────────────────────────────────────
 

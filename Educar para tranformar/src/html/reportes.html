@@ -62,12 +62,14 @@
                                 <option value="deporte">Alumnos por deporte (nivel, horario y profesor)</option>
                                 <option value="recorrido">Alumnos por recorrido de transporte</option>
                                 <option value="comedor">Alumnos inscriptos al comedor</option>
+                                <option value="asistencia">Asistencia diaria por curso (credencial QR)</option>
                                 <option value="auditoria">Auditoría de operaciones (web / app)</option>
                             </select>
                         </div>
                         <div class="col-md-3 filtro" data-para="alumno"><label class="form-label small mb-1" for="fAlumno">Alumno</label><select id="fAlumno" class="form-select form-select-sm"></select></div>
                         <div class="col-md-3 filtro" data-para="docente"><label class="form-label small mb-1" for="fDocente">Docente</label><select id="fDocente" class="form-select form-select-sm"></select></div>
-                        <div class="col-md-3 filtro" data-para="curso"><label class="form-label small mb-1" for="fCurso">Curso</label><select id="fCurso" class="form-select form-select-sm"></select></div>
+                        <div class="col-md-2 filtro" data-para="asistencia"><label class="form-label small mb-1" for="fFecha">Fecha</label><input type="date" id="fFecha" class="form-control form-control-sm"></div>
+                        <div class="col-md-3 filtro" data-para="curso asistencia"><label class="form-label small mb-1" for="fCurso">Curso</label><select id="fCurso" class="form-select form-select-sm"></select></div>
                         <div class="col-md-3 filtro" data-para="materia"><label class="form-label small mb-1" for="fMateria">Materia</label><select id="fMateria" class="form-select form-select-sm"></select></div>
                         <div class="col-md-3 filtro" data-para="deporte"><label class="form-label small mb-1" for="fDeporte">Deporte</label><select id="fDeporte" class="form-select form-select-sm"></select></div>
                         <div class="col-md-2 filtro" data-para="nivel deporte"><label class="form-label small mb-1" for="fNivel">Nivel</label><select id="fNivel" class="form-select form-select-sm"></select></div>
@@ -97,6 +99,7 @@
         document.querySelectorAll('.filtro').forEach((f) => f.classList.toggle('d-none', !f.dataset.para.split(' ').includes(t)));
     }
     $('tipo').addEventListener('change', ajustar);
+    $('fFecha').value = new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10); // hoy en Argentina
     ajustar();
 
     Promise.all([P.api('/alumnos'), P.api('/docentes'), P.api('/cursos'), P.api('/materias'), P.api('/deportes'), P.api('/niveles')])
@@ -148,6 +151,14 @@
         comedor: { ruta: () => '/reportes/comedor', columnas: [
             { titulo: 'Nivel', campo: 'nivel' }, { titulo: 'Curso', campo: 'curso' }, { titulo: 'Alumno', campo: 'alumno' },
             { titulo: 'Legajo', campo: 'legajo' }, { titulo: 'Modalidad', campo: 'modalidad' }, { titulo: 'Inscripción', valor: (f) => P.fecha(f.fecha_inscripcion) }] },
+        asistencia: { ruta: () => '/reportes/asistencia' + q({ fecha: $('fFecha').value, id_curso: $('fCurso').value }),
+            transformar: (d) => ({ resumen: `${d.fecha.split('-').reverse().join('/')}: ${d.presentes} presente(s) y ${d.ausentes} ausente(s) de ${d.total} alumno(s)`, filas: d.alumnos }),
+            columnas: [
+            { titulo: 'Nivel', campo: 'nivel' }, { titulo: 'Curso', valor: (f) => f.curso + (f.division ? ' ' + f.division : '') },
+            { titulo: 'Legajo', campo: 'legajo' }, { titulo: 'Alumno', campo: 'alumno' },
+            { titulo: 'Asistencia', valor: (f) => (f.presente ? 'Presente' : 'Ausente') },
+            { titulo: 'Ingreso', campo: 'ingreso' }, { titulo: 'Salida', campo: 'egreso' },
+            { titulo: 'Sube al micro', campo: 'sube_micro' }, { titulo: 'Baja del micro', campo: 'baja_micro' }] },
         auditoria: { ruta: () => '/reportes/auditoria', columnas: [
             { titulo: 'Fecha', valor: (f) => P.fechaHora(f.creado_en) }, { titulo: 'Usuario', campo: 'email' }, { titulo: 'Acción', campo: 'accion' },
             { titulo: 'Origen', campo: 'origen' }, { titulo: 'Detalle', valor: (f) => (f.detalle ? JSON.stringify(f.detalle) : '') }] }
@@ -194,12 +205,14 @@
         }
 
         const rep = REPORTES[t];
-        P.api(rep.ruta()).then((filas) => {
+        P.api(rep.ruta()).then((datos) => {
+            const t2 = rep.transformar ? rep.transformar(datos) : { filas: datos };
+            const filas = t2.filas;
             ultimo = { nombre: 'reporte-' + t, columnas: rep.columnas, filas };
             $('btnCsv').disabled = !filas.length;
             const r = $('resultado');
             r.innerHTML = '';
-            r.appendChild(P.el('p', 'fw-bold', `${filas.length} registro(s)`));
+            r.appendChild(P.el('p', 'fw-bold', t2.resumen || `${filas.length} registro(s)`));
             const cont = P.el('div');
             r.appendChild(cont);
             P.tabla(cont, rep.columnas, filas, 'Sin datos para los filtros elegidos.');

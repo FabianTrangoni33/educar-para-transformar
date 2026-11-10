@@ -24,6 +24,11 @@ export function PantallaInicioPadre({ navigation }: any) {
     <Pantalla refrescando={pagos.cargando} alRefrescar={pagos.recargar}>
       <Titulo sub="Elegí a tu hijo para ver su información académica.">Hola, {perfil?.usuario.nombre}</Titulo>
       <AvisoSinConexion visible={pagos.desdeCache} sincronizadoEn={pagos.sincronizadoEn} />
+      {hijos.length > 0 ? (
+        <Tarjeta alPresionar={() => navigation.navigate('Credencial')} etiqueta="Ver credenciales digitales" estilo={{ backgroundColor: colores.primarioClaro }}>
+          <Fila icono="qr-code-outline" titulo="Credencial digital" detalle="QR para portería y transporte. Te avisamos cuando entran y salen." />
+        </Tarjeta>
+      ) : null}
       {hijos.length === 0 ? <Vacio texto="No hay alumnos asociados a tu cuenta. Consultá con administración." /> : hijos.map(h => {
         const p = saldoDe(h.id_alumno);
         return (

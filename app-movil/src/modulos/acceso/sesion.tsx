@@ -7,7 +7,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import { api } from '../../nucleo/apiClient';
 import { almacenSeguro } from '../../nucleo/almacenamientoSeguro';
 import { cache } from '../../nucleo/cache';
-import { accesoRepo } from '../../repositorios';
+import { accesoRepo, qrRepo } from '../../repositorios';
 import { desregistrarPush, registrarPush } from '../notificaciones/push';
 import type { Perfil } from '../../modelos';
 
@@ -19,6 +19,8 @@ type Sesion = {
   aviso: string | null;
   biometriaActiva: boolean;
   ingresar: (usuario: string, password: string) => Promise<void>;
+  /** Ingreso escaneando el QR que genera la web con la sesión abierta */
+  ingresarConQR: (codigo: string) => Promise<void>;
   salir: (aviso?: string) => Promise<void>;
   desbloquear: () => Promise<boolean>;
   cambiarBiometria: (activar: boolean) => Promise<string | null>;
@@ -92,8 +94,8 @@ export function SesionProvider({ children }: { children: React.ReactNode }) {
     if (estado === 'activo' && perfil && perfil.usuario.rol !== 'ADMIN') registrarPush().catch(() => {});
   }, [estado, perfil]);
 
-  const ingresar = useCallback(async (usuario: string, password: string) => {
-    const r = await accesoRepo.login(usuario, password);
+  /** Guarda la sesión recibida (login normal o con QR) y deja la app activa */
+  const activar = useCallback(async (r: { token: string; refresh_token: string }) => {
     api.setToken(r.token);
     await almacenSeguro.guardar('token', r.token);
     await almacenSeguro.guardar('refresh', r.refresh_token);
@@ -103,6 +105,14 @@ export function SesionProvider({ children }: { children: React.ReactNode }) {
     setAviso(null);
     setEstado('activo');
   }, []);
+
+  const ingresar = useCallback(async (usuario: string, password: string) => {
+    await activar(await accesoRepo.login(usuario, password));
+  }, [activar]);
+
+  const ingresarConQR = useCallback(async (codigo: string) => {
+    await activar(await qrRepo.canjearApp(codigo));
+  }, [activar]);
 
   const desbloquear = useCallback(async () => {
     const r = await LocalAuthentication.authenticateAsync({ promptMessage: 'Desbloqueá Educar para Transformar', cancelLabel: 'Cancelar' });
@@ -122,9 +132,9 @@ export function SesionProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const valor = useMemo<Sesion>(() => ({
-    estado, perfil, aviso, biometriaActiva, ingresar, salir, desbloquear, cambiarBiometria, recargarPerfil,
+    estado, perfil, aviso, biometriaActiva, ingresar, ingresarConQR, salir, desbloquear, cambiarBiometria, recargarPerfil,
     limpiarAviso: () => setAviso(null)
-  }), [estado, perfil, aviso, biometriaActiva, ingresar, salir, desbloquear, cambiarBiometria, recargarPerfil]);
+  }), [estado, perfil, aviso, biometriaActiva, ingresar, ingresarConQR, salir, desbloquear, cambiarBiometria, recargarPerfil]);
 
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;
 }

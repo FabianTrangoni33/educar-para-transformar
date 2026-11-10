@@ -234,3 +234,25 @@ CREATE INDEX IF NOT EXISTS idx_facturas_alumno ON facturas(id_alumno);
 CREATE INDEX IF NOT EXISTS idx_items_factura ON factura_items(id_factura);
 CREATE INDEX IF NOT EXISTS idx_comprobantes_factura ON comprobantes_pago(id_factura);
 CREATE INDEX IF NOT EXISTS idx_notificaciones_usuario ON notificaciones(id_usuario, creado_en DESC);
+
+-- ─── Valor agregado (TP1 punto 5): login con QR y credencial digital ───
+-- (modulo-qr.js también las crea si faltan)
+CREATE TABLE IF NOT EXISTS sesiones_qr (
+    codigo_hash VARCHAR(64) PRIMARY KEY,
+    clave_hash  VARCHAR(64),
+    sentido     VARCHAR(10) NOT NULL CHECK (sentido IN ('A_WEB', 'A_APP')),
+    estado      VARCHAR(12) NOT NULL DEFAULT 'PENDIENTE' CHECK (estado IN ('PENDIENTE', 'APROBADA', 'USADA')),
+    id_usuario  INT REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    creado_en   TIMESTAMPTZ DEFAULT now(),
+    expira_en   TIMESTAMPTZ NOT NULL
+);
+CREATE TABLE IF NOT EXISTS movimientos_alumno (
+    id               SERIAL PRIMARY KEY,
+    id_alumno        INT NOT NULL REFERENCES alumnos(id_alumno) ON DELETE CASCADE,
+    tipo             VARCHAR(12) NOT NULL CHECK (tipo IN ('INGRESO', 'EGRESO', 'SUBE_MICRO', 'BAJA_MICRO')),
+    recorrido_numero INT,
+    registrado_por   INT REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
+    origen           VARCHAR(10),
+    creado_en        TIMESTAMPTZ DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_movimientos_alumno ON movimientos_alumno (id_alumno, creado_en);

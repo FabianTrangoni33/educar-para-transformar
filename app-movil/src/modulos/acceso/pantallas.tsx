@@ -48,6 +48,7 @@ export function PantallaLogin() {
         <Campo etiqueta="Contraseña" value={password} onChangeText={setPassword} secureTextEntry autoComplete="password" textContentType="password" onSubmitEditing={enviar} />
         {error ? <Text style={{ color: colores.error, marginBottom: espacio.m }} accessibilityRole="alert">{error}</Text> : null}
         <Boton texto="Ingresar" icono="log-in-outline" alPresionar={enviar} cargando={cargando} />
+        <Boton texto="Ingresar con QR desde la web" icono="qr-code-outline" variante="secundario" alPresionar={() => nav.navigate('EscanerIngreso')} />
         <Boton texto="Olvidé mi contraseña" variante="texto" alPresionar={() => nav.navigate('Recuperar')} />
       </Pantalla>
     </KeyboardAvoidingView>
@@ -176,6 +177,22 @@ export function PantallaPerfil() {
           <Campo etiqueta="Contraseña actual" value={actual} onChangeText={setActual} secureTextEntry />
           <Campo etiqueta="Nueva contraseña" value={nueva} onChangeText={setNueva} secureTextEntry />
           <Boton texto="Guardar nueva contraseña" variante="secundario" alPresionar={cambiar} cargando={cargando} />
+        </Tarjeta>
+      </Seccion>
+
+      <Seccion titulo="Códigos QR">
+        {u.rol === 'PADRE' || u.rol === 'ESTUDIANTE' ? (
+          <Tarjeta alPresionar={() => nav.navigate('Credencial')} etiqueta="Ver credencial digital">
+            <Fila icono="id-card-outline" titulo="Credencial digital" detalle={u.rol === 'PADRE' ? 'QR de cada hijo para portería y transporte' : 'Tu QR para portería y transporte'} />
+          </Tarjeta>
+        ) : null}
+        {u.rol === 'DOCENTE' || u.rol === 'ADMIN' ? (
+          <Tarjeta alPresionar={() => nav.navigate('Escaner', { modo: 'porteria' })} etiqueta="Registrar ingresos">
+            <Fila icono="scan-outline" titulo="Portería y transporte" detalle="Escaneá credenciales para registrar ingresos y salidas" />
+          </Tarjeta>
+        ) : null}
+        <Tarjeta alPresionar={() => nav.navigate('Escaner', { modo: 'autorizar-web' })} etiqueta="Iniciar sesión en la web con QR">
+          <Fila icono="desktop-outline" titulo="Iniciar sesión en la web" detalle="Escaneá el QR de la página de ingreso y entrás sin contraseña" />
         </Tarjeta>
       </Seccion>
 

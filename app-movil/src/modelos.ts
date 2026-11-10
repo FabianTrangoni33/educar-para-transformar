@@ -42,3 +42,13 @@ export type ResumenPagoHijo = { id_alumno: number; nombre: string; saldo: number
 export type Notificacion = { id: number; titulo: string; cuerpo: string; tipo: string; datos: Record<string, unknown> | null; leida: boolean; creado_en: string };
 export type Noticia = { id_noticia: number; titulo: string; categoria: string; fecha: string; imagen_url: string; descripcion: string; cuerpo: string | null };
 export type Opinion = { id_opinion: number; nombre: string; comentario: string; calificacion: number; creado_en: string };
+
+// ── Valor agregado: credencial digital y login con QR ──
+export type TipoMovimiento = 'INGRESO' | 'EGRESO' | 'SUBE_MICRO' | 'BAJA_MICRO';
+export type Movimiento = { tipo: TipoMovimiento; titulo: string; recorrido_numero: number | null; creado_en: string };
+export type Credencial = {
+  id_alumno: number; nombre: string; apellido: string; legajo: string; dni: string | null; estado: string | null;
+  curso: string | null; division: string | null; nivel: string | null; recorrido_numero: number | null;
+  qr: string; movimientos: Movimiento[];
+};
+export type ResultadoMovimiento = { mensaje: string; tipo: TipoMovimiento; hora: string; alumno: { nombre: string; apellido: string; legajo: string; curso: string | null; nivel: string | null } };
