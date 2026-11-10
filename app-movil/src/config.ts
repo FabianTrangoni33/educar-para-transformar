@@ -1,11 +1,11 @@
 /**
  * Configuración de la app.
  * EXPO_PUBLIC_API_URL es el dominio del backend (el mismo que usa la web), por ejemplo
- *   https://educar-para-transformar.vercel.app     (producción, HTTPS)
+ *   https://educar-para-transformar-opal.vercel.app     (producción, HTTPS)
  *   http://192.168.0.10:3000                       (desarrollo: IP de la PC que corre `node API_Server.js`)
  * Se define en app-movil/.env (ver .env.example).
  */
-const ORIGEN = (process.env.EXPO_PUBLIC_API_URL || 'https://educar-para-transformar.vercel.app').replace(/\/+$/, '');
+const ORIGEN = (process.env.EXPO_PUBLIC_API_URL || 'https://educar-para-transformar-opal.vercel.app').replace(/\/+$/, '');
 
 export const config = {
   /** Dominio del sitio (sirve también las imágenes /img/...) */
