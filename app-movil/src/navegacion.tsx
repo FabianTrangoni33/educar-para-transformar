@@ -6,17 +6,15 @@
  *  Padre       → Mis hijos · Inscripciones · Cuotas · Avisos · Perfil
  *  Estudiante  → Mis datos · Credencial · Avisos · Perfil
  *  Docente     → Mis cursos · Portería (escáner QR) · Avisos · Perfil
- *  Admin       → acceso a la web + escáner de portería
+ *  Admin       → Inicio (indicadores) · Comprobantes · Portería · Avisos · Perfil (lo demás, en la web)
  */
 import React, { useEffect } from 'react';
-import { Linking, Text, View } from 'react-native';
 import { NavigationContainer, createNavigationContainerRef, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { colores } from './tema';
-import { config } from './config';
-import { Boton, Cargando, s } from './componentes/ui';
+import { Cargando } from './componentes/ui';
 import { useSesion } from './modulos/acceso/sesion';
 import { PantallaBloqueo, PantallaLogin, PantallaPerfil, PantallaRecuperar } from './modulos/acceso/pantallas';
 import { PantallaGaleria, PantallaInstitucional, PantallaNoticias, PantallaOpinar } from './modulos/institucional/pantallas';
@@ -27,6 +25,8 @@ import { PantallaAlumnosCurso, PantallaDocente } from './modulos/docentes/pantal
 import { PantallaAvisos } from './modulos/notificaciones/pantallas';
 import { escucharToques } from './modulos/notificaciones/push';
 import { PantallaCredencial, PantallaEscaner } from './modulos/qr/pantallas';
+import { PantallaFichaSalud } from './modulos/salud/pantallas';
+import { PantallaAdminInicio, PantallaAsistenciaAdmin, PantallaComprobantesAdmin } from './modulos/admin/pantallas';
 
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
@@ -113,19 +113,16 @@ function TabsDocente() {
   );
 }
 
-// ── Administrador: opera solo desde la web ──
-function PantallaSoloWeb({ navigation }: any) {
-  const { salir } = useSesion();
+// ── Administrador: modo reducido en la app (la gestión completa sigue en la web) ──
+function TabsAdmin() {
   return (
-    <View style={[s.pantalla, s.centro]}>
-      <Ionicons name="desktop-outline" size={64} color={colores.primario} />
-      <Text style={[s.titulo, { textAlign: 'center', marginVertical: 12 }]}>El rol Administrador usa el sistema web</Text>
-      <Text style={[s.textoSuave, { textAlign: 'center', marginBottom: 16 }]}>ABM, reportes, tarifas y revisión de pagos se gestionan desde el panel web.</Text>
-      <Boton texto="Abrir el sistema web" icono="open-outline" alPresionar={() => Linking.openURL(`${config.origen}/html/login-admin.html`)} estilo={{ alignSelf: 'stretch' }} />
-      <Boton texto="Registrar ingresos (portería)" icono="scan-outline" variante="secundario" alPresionar={() => navigation.navigate('Escaner', { modo: 'porteria' })} estilo={{ alignSelf: 'stretch' }} />
-      <Boton texto="Iniciar sesión en la web con QR" icono="qr-code-outline" variante="secundario" alPresionar={() => navigation.navigate('Escaner', { modo: 'autorizar-web' })} estilo={{ alignSelf: 'stretch' }} />
-      <Boton texto="Cerrar sesión" variante="texto" alPresionar={() => salir()} />
-    </View>
+    <Tabs.Navigator>
+      <Tabs.Screen name="InicioAdmin" component={PantallaAdminInicio} options={opcionesTabs('speedometer-outline', 'Inicio')} />
+      <Tabs.Screen name="Comprobantes" component={PantallaComprobantesAdmin} options={opcionesTabs('receipt-outline', 'Comprobantes')} />
+      <Tabs.Screen name="Porteria" component={PantallaEscaner} initialParams={{ modo: 'porteria' }} options={opcionesTabs('scan-outline', 'Portería')} />
+      <Tabs.Screen name="Avisos" component={PantallaAvisos} options={opcionesTabs('notifications-outline', 'Avisos')} />
+      <Tabs.Screen name="Perfil" component={PantallaPerfil} options={opcionesTabs('person-circle-outline', 'Perfil')} />
+    </Tabs.Navigator>
   );
 }
 
@@ -146,7 +143,7 @@ export function Navegacion() {
 
   if (estado === 'iniciando') return <Cargando texto="Iniciando..." />;
 
-  const tabsPorRol = rol === 'PADRE' ? TabsPadre : rol === 'ESTUDIANTE' ? TabsEstudiante : rol === 'DOCENTE' ? TabsDocente : PantallaSoloWeb;
+  const tabsPorRol = rol === 'PADRE' ? TabsPadre : rol === 'ESTUDIANTE' ? TabsEstudiante : rol === 'DOCENTE' ? TabsDocente : TabsAdmin;
 
   return (
     <NavigationContainer ref={navegacionRef} theme={{ ...DefaultTheme, colors: { ...DefaultTheme.colors, background: colores.fondo, primary: colores.primario } }}>
@@ -168,6 +165,8 @@ export function Navegacion() {
             <Stack.Screen name="Galeria" component={PantallaGaleria} options={{ title: 'Galería' }} />
             <Stack.Screen name="Opinar" component={PantallaOpinar} options={{ title: 'Opiniones' }} />
             <Stack.Screen name="AlumnosCurso" component={PantallaAlumnosCurso} options={({ route }: any) => ({ title: route.params?.titulo ?? 'Alumnos' })} />
+            <Stack.Screen name="FichaSalud" component={PantallaFichaSalud} options={({ route }: any) => ({ title: route.params?.nombre ? `Salud · ${route.params.nombre}` : 'Ficha de salud' })} />
+            <Stack.Screen name="AsistenciaAdmin" component={PantallaAsistenciaAdmin} options={{ title: 'Asistencia del día' }} />
             {/* Valor agregado: credencial digital y escáner QR */}
             <Stack.Screen name="Credencial" component={PantallaCredencial} options={{ title: 'Credencial digital' }} />
             <Stack.Screen name="Escaner" component={PantallaEscaner} options={({ route }: any) => ({ title: route.params?.modo === 'autorizar-web' ? 'Ingresar en la web' : 'Portería' })} />

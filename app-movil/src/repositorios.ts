@@ -6,7 +6,8 @@
 import { api } from './nucleo/apiClient';
 import type {
   Perfil, ResumenAlumno, Deporte, Recorrido, DatosDocente, AlumnoDeCurso, Factura, DetalleFactura, Deuda,
-  ResumenPagoHijo, Notificacion, Noticia, Opinion, Credencial, TipoMovimiento, ResultadoMovimiento
+  ResumenPagoHijo, Notificacion, Noticia, Opinion, Credencial, TipoMovimiento, ResultadoMovimiento,
+  FichaSalud, RespuestaSalud, ResumenAdmin, ComprobanteAdmin, AsistenciaDia
 } from './modelos';
 
 const num = (v: unknown) => (v == null ? 0 : Number(v));
@@ -92,4 +93,19 @@ export const qrRepo = {
     api.post<{ token: string; refresh_token: string; usuario: { rol: string } }>('/qr-login/app/canjear', { codigo }, false),
   credenciales: () => api.get<Credencial[]>('/movil/credenciales'),
   registrarMovimiento: (qr: string, tipo: TipoMovimiento) => api.post<ResultadoMovimiento>('/movil/movimientos', { qr, tipo })
+};
+
+export const saludRepo = {
+  ver: (idAlumno: number) => api.get<RespuestaSalud>(`/movil/alumnos/${idAlumno}/salud`),
+  guardar: (idAlumno: number, ficha: FichaSalud) => api.put<{ mensaje: string }>(`/movil/alumnos/${idAlumno}/salud`, ficha)
+};
+
+export const adminRepo = {
+  resumen: () => api.get<ResumenAdmin>('/movil/admin/resumen'),
+  comprobantes: (estado = 'PENDIENTE') => api.get<any[]>(`/admin/comprobantes?estado=${estado}`).then(l => l.map(c => ({
+    ...c, monto: Number(c.monto), items: (c.items || []).map((i: any) => ({ descripcion: i.descripcion, monto: Number(i.monto) }))
+  })) as ComprobanteAdmin[]),
+  revisar: (id: number, estado: 'APROBADO' | 'RECHAZADO', observacion?: string) =>
+    api.put<{ mensaje: string }>(`/admin/comprobantes/${id}`, { estado, observacion }),
+  asistencia: () => api.get<AsistenciaDia>('/reportes/asistencia')
 };

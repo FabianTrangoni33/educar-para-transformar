@@ -268,3 +268,22 @@ CREATE TABLE IF NOT EXISTS consultas_web (
     atendida   BOOLEAN NOT NULL DEFAULT FALSE,
     creado_en  TIMESTAMPTZ DEFAULT now()
 );
+
+-- Ficha de salud del alumno (datos sensibles: la completa la familia; la ven docentes del curso y administración)
+CREATE TABLE IF NOT EXISTS fichas_salud (
+    id_alumno             INT PRIMARY KEY REFERENCES alumnos(id_alumno) ON DELETE CASCADE,
+    grupo_sanguineo       VARCHAR(4),
+    alergias              VARCHAR(500),
+    medicacion            VARCHAR(500),
+    condiciones           VARCHAR(500),
+    obra_social           VARCHAR(100),
+    nro_afiliado          VARCHAR(50),
+    emergencia_nombre     VARCHAR(100),
+    emergencia_telefono   VARCHAR(30),
+    emergencia_parentesco VARCHAR(40),
+    observaciones         VARCHAR(800),
+    autoriza_imagen       BOOLEAN NOT NULL DEFAULT FALSE,
+    autoriza_salidas      BOOLEAN NOT NULL DEFAULT FALSE,
+    actualizado_por       INT REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
+    actualizado_en        TIMESTAMPTZ DEFAULT now()
+);

@@ -12,7 +12,9 @@
     <link rel="stylesheet" href="../css/dashboard.css">
     <style>
         .role-card { cursor: pointer; transition: all .2s; }
-        .btn-check:checked + .role-card { background: #0d6efd; color: white; border-color: #0d6efd; }
+        .btn-check:checked + .role-card { background: var(--logo-primario); color: white; border-color: var(--logo-primario); }
+        .btn-outline-info.role-card { color: #0f766e; border-color: var(--logo-terciario); }
+        .btn-check:checked + .btn-outline-info.role-card { background: var(--logo-terciario); color: #fff; border-color: var(--logo-terciario); }
         .badge-alumno  { background: #cfe2ff; color: #084298; }
         .badge-docente { background: #d1e7dd; color: #0a3622; }
         .badge-familia { background: #fff3cd; color: #664d03; }
@@ -138,6 +140,12 @@
                                     </div>
                                 </div>
 
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small text-secondary" for="email">Correo electrónico</label>
+                                    <input type="email" id="email" class="form-control" placeholder="Ej: lucas.fernandez@gmail.com" maxlength="120" autocomplete="off">
+                                    <div class="form-text">Se usa para recuperar la contraseña y recibir avisos. Si queda vacío, no podrá recuperarla por correo.</div>
+                                </div>
+
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
                                         <label class="form-label fw-bold small text-secondary">Edad</label>
@@ -245,6 +253,9 @@
                                             <div class="col-6">
                                                 <input type="text" id="tutorTelefono" class="form-control form-control-sm" placeholder="Teléfono tutor">
                                             </div>
+                                            <div class="col-12">
+                                                <input type="email" id="tutorEmail" class="form-control form-control-sm" placeholder="Correo del tutor (para recuperar la contraseña)" maxlength="120">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -324,8 +335,7 @@
                                             <th class="ps-3">Usuario</th>
                                             <th>Rol</th>
                                             <th>Nivel</th>
-                                            <th>Estado</th>
-                                            <th class="text-end pe-3">Acción</th>
+                                            <th class="pe-3">Estado</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tablaUsuariosAdmin">
@@ -486,7 +496,7 @@
         } catch (e) {
             console.error('Error leyendo usuarios de PostgreSQL:', e);
             if (tabla) {
-                tabla.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">
+                tabla.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4">
                     <span class="material-symbols-outlined align-middle me-1">error</span>
                     Error al conectar con la base de datos: ${e.message}
                 </td></tr>`;
@@ -500,7 +510,7 @@
         tabla.innerHTML = '';
 
         if (usuarios.length === 0) {
-            tabla.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No se encontraron usuarios coincidentes con los filtros seleccionados.</td></tr>';
+            tabla.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">No se encontraron usuarios coincidentes con los filtros seleccionados.</td></tr>';
             return;
         }
 
@@ -531,7 +541,8 @@
             tr.innerHTML = `
                 <td class="ps-3 py-3">
                     <div class="fw-bold text-dark">${u.nombre || 'Sin nombre'} ${u.apellido || ''}</div>
-                    <small class="text-muted">DNI: ${u.dni || 'S/D'} • ${u.email || ''}</small>
+                    <small class="text-muted">DNI: ${u.dni || 'S/D'} • ${esc(u.email || '')}</small>
+                    ${correoInterno(u.email) ? '<div class="mt-1"><span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle" title="No podrá recuperar la contraseña por correo"><span class="material-symbols-outlined align-middle" style="font-size:13px;">mail_off</span> Sin correo real</span></div>' : ''}
                     ${(u.edad || u.genero) ? `<div class="text-secondary small mt-1" style="font-size:0.75rem;"><span class="material-symbols-outlined align-middle" style="font-size:13px;">person</span> ${u.edad ? u.edad + ' años' : ''} ${u.edad && u.genero ? '•' : ''} ${u.genero || ''}</div>` : ''}
                     ${u.curso ? `<div class="mt-1"><span class="badge bg-primary-subtle text-primary border border-primary-subtle"><span class="material-symbols-outlined align-middle" style="font-size:13px;">school</span> ${u.curso}${u.ciclo ? ' • ' + u.ciclo : ''}</span></div>` : ''}
                     ${u.tutorNombre ? `<div class="mt-1"><span class="badge bg-light text-primary border"><span class="material-symbols-outlined align-middle" style="font-size:13px;">family_restroom</span> Tutor: ${u.tutorNombre}</span></div>` : ''}
@@ -543,17 +554,19 @@
                                </div>`
                             : `<div class="mt-1"><span class="badge bg-light text-secondary border" style="font-size:11px;">Sin materias asignadas</span></div>`
                     ) : ''}
+                    <div class="d-flex flex-wrap gap-2 mt-2">
+                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1 small fw-bold" onclick="editarCorreo(${Number(u.id)})">
+                            <span class="material-symbols-outlined align-middle fs-6">mail</span> Correo
+                        </button>
+                        ${esAdmin ? '<span class="text-muted small align-self-center">Cuenta protegida</span>' : `
+                        <button class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1 small fw-bold" onclick="eliminarUsuario(${Number(u.id)})">
+                            <span class="material-symbols-outlined align-middle fs-6">delete</span> Eliminar
+                        </button>`}
+                    </div>
                 </td>
                 <td><span class="badge rounded-pill ${badgeRolClase} border">${rolTexto}</span></td>
                 <td><small class="text-secondary fw-medium">${nivelTexto}</small></td>
-                <td><span class="badge bg-success-subtle text-success rounded-pill px-2">${estadoTexto}</span></td>
-                <td class="text-end pe-3">
-                    ${esAdmin ? '<span class="text-muted small">Protegido</span>' : `
-                    <button class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1 small fw-bold" onclick="eliminarUsuario(${u.id})">
-                        <span class="material-symbols-outlined align-middle fs-6">delete</span> Eliminar
-                    </button>
-                    `}
-                </td>
+                <td class="pe-3"><span class="badge bg-success-subtle text-success rounded-pill px-2">${estadoTexto}</span></td>
             `;
             tabla.appendChild(tr);
         });
@@ -649,6 +662,33 @@
     }
 
     // Eliminar usuario
+    // Correos generados automáticamente (no reciben mails): DNI@novasys.edu.ar / DNI@escuela.edu.ar
+    function correoInterno(email) { return !email || /^\d+@(novasys|escuela)\.edu\.ar$/i.test(email); }
+    function esc(t) { return String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+    window.editarCorreo = async function(id) {
+        const u = (listaUsuariosCache || []).find((x) => Number(x.id) === Number(id)) || {};
+        const actual = correoInterno(u.email) ? '' : (u.email || '');
+        const email = prompt(`Correo electrónico de ${u.nombre || ''} ${u.apellido || ''}
+(se usa para recuperar la contraseña):`, actual);
+        if (email === null) return;
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${API_URL}/${id}/email`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': token ? `Bearer ${token}` : '' },
+                body: JSON.stringify({ email: email.trim() })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.ok) throw new Error(data.error || 'No se pudo guardar el correo');
+            mostrarAlerta('Correo actualizado. Ya puede usar "Recuperar contraseña".', 'success');
+            listaUsuariosCache = [];
+            await renderizarTablaUsuarios(document.getElementById('inputBuscarUsuario')?.value || '');
+        } catch (err) {
+            mostrarAlerta(err.message, 'danger');
+        }
+    };
+
     window.eliminarUsuario = async function(id) {
         if (!confirm('¿Estás seguro de eliminar este usuario? Esta acción es irreversible.')) return;
         try {
@@ -722,6 +762,11 @@
             const apellido = document.getElementById('apellido').value.trim();
             const dni = document.getElementById('dni').value.trim();
             const password = document.getElementById('password').value;
+            const email = document.getElementById('email')?.value.trim() || '';
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                mostrarAlerta('El correo electrónico no es válido.', 'danger');
+                return;
+            }
             const edadInput = document.getElementById('edad')?.value;
             let edad = null;
             if (edadInput !== undefined && edadInput !== null && edadInput.trim() !== '') {
@@ -755,6 +800,7 @@
             let tutor_nombre = null;
             let tutor_apellido = null;
             let tutor_telefono = null;
+            let tutor_email = null;
 
             if (rol === 'alumno') {
                 const selectCurso = document.getElementById('selectCurso');
@@ -778,6 +824,7 @@
                     tutor_apellido = document.getElementById('tutorApellido')?.value.trim();
                     tutor_dni = document.getElementById('tutorDni')?.value.trim();
                     tutor_telefono = document.getElementById('tutorTelefono')?.value.trim();
+                    tutor_email = document.getElementById('tutorEmail')?.value.trim();
 
                     if (!tutor_nombre || !tutor_apellido || !tutor_dni) {
                         mostrarAlerta('Por favor completa Nombre, Apellido y DNI del nuevo tutor.', 'warning');
@@ -796,9 +843,9 @@
                 const token = localStorage.getItem('token');
                 const payload = {
                     nombre, apellido, dni, password, rol, nivel,
-                    edad, genero,
+                    edad, genero, email,
                     id_curso,
-                    id_tutor, tutor_dni, tutor_nombre, tutor_apellido, tutor_telefono
+                    id_tutor, tutor_dni, tutor_nombre, tutor_apellido, tutor_telefono, tutor_email
                 };
 
                 const res = await fetch(API_URL, {

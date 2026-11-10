@@ -53,3 +53,24 @@ export type Credencial = {
   qr: string; movimientos: Movimiento[];
 };
 export type ResultadoMovimiento = { mensaje: string; tipo: TipoMovimiento; hora: string; alumno: { nombre: string; apellido: string; legajo: string; curso: string | null; nivel: string | null } };
+
+// ── Ficha de salud del alumno ──
+export type FichaSalud = {
+  grupo_sanguineo: string | null; alergias: string | null; medicacion: string | null; condiciones: string | null;
+  obra_social: string | null; nro_afiliado: string | null; emergencia_nombre: string | null; emergencia_telefono: string | null;
+  emergencia_parentesco: string | null; observaciones: string | null; autoriza_imagen: boolean; autoriza_salidas: boolean;
+  actualizado_en?: string; actualizado_por_nombre?: string | null;
+};
+export type RespuestaSalud = { ficha: FichaSalud | null; puede_editar: boolean };
+
+// ── Administración en la app ──
+export type ResumenAdmin = { alumnos: number; docentes: number; preinscripciones: number; comprobantes_pendientes: number; monto_pendiente: number; presentes_hoy: number; consultas_pendientes: number };
+export type ComprobanteAdmin = {
+  id_comprobante: number; numero: string; nro_operacion: string; fecha_transferencia: string; monto: number; estado: string;
+  observacion: string | null; creado_en: string; tiene_archivo: boolean; archivo_nombre: string | null; factura: string; periodo: string; alumno: string;
+  items: { descripcion: string; monto: number }[];
+};
+export type AsistenciaDia = {
+  fecha: string; total: number; presentes: number; ausentes: number;
+  alumnos: { nivel: string; curso: string; division: string | null; legajo: string; alumno: string; ingreso: string | null; egreso: string | null; presente: boolean }[];
+};

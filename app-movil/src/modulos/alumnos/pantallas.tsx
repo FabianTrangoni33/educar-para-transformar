@@ -57,7 +57,7 @@ export function PantallaInicioPadre({ navigation }: any) {
 
 // ── Datos académicos (padre o estudiante) ───────────────────────────────────
 
-export function PantallaAlumno({ route }: any) {
+export function PantallaAlumno({ route, navigation }: any) {
   const { perfil } = useSesion();
   const idAlumno: number | undefined = route?.params?.idAlumno ?? perfil?.alumno?.id_alumno;
   const consulta = useConsulta(idAlumno ? `resumen-${idAlumno}` : null, () => alumnosRepo.resumen(idAlumno!));
@@ -74,6 +74,8 @@ export function PantallaAlumno({ route }: any) {
               <Text style={[s.titulo, { fontSize: 20 }]}>{d.alumno.nombre} {d.alumno.apellido}</Text>
               <Text style={s.textoSuave}>{d.alumno.curso ?? 'Sin curso asignado'}{d.alumno.nivel ? ` · ${d.alumno.nivel}` : ''}{d.alumno.ciclo ? ` · ${d.alumno.ciclo}` : ''}</Text>
               <Text style={s.textoSuave}>Legajo {d.alumno.legajo} · {d.alumno.estado}</Text>
+              <Boton texto="Ficha de salud" icono="medkit-outline" variante="secundario" estilo={{ marginTop: espacio.s }}
+                alPresionar={() => navigation.navigate('FichaSalud', { idAlumno, nombre: d.alumno.nombre })} />
             </Tarjeta>
             <View style={[s.filaChips, { marginBottom: espacio.s }]}>
               <Chip texto="Materias y notas" activo={vista === 'materias'} alPresionar={() => setVista('materias')} />

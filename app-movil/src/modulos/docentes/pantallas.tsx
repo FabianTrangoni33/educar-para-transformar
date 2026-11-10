@@ -67,7 +67,7 @@ export function PantallaDocente({ navigation }: any) {
 }
 
 /** Alumnos activos de un curso del docente, con el contacto de sus tutores. */
-export function PantallaAlumnosCurso({ route }: any) {
+export function PantallaAlumnosCurso({ route, navigation }: any) {
   const idCurso: number = route.params.idCurso;
   const consulta = useConsulta(`docente-curso-${idCurso}`, () => docentesRepo.alumnosDeCurso(idCurso));
   const [abierto, setAbierto] = useState<number | null>(null);
@@ -94,6 +94,8 @@ export function PantallaAlumnosCurso({ route }: any) {
                         {t.telefono ? <Boton texto={`Llamar ${t.telefono}`} icono="call-outline" variante="texto" alPresionar={() => Linking.openURL(`tel:${t.telefono}`)} /> : null}
                       </View>
                     ))}
+                    <Boton texto="Ficha de salud" icono="medkit-outline" variante="secundario" estilo={{ marginTop: espacio.s }}
+                      alPresionar={() => navigation.navigate('FichaSalud', { idAlumno: a.id_alumno, nombre: a.nombre })} />
                   </View>
                 ) : null}
               </Tarjeta>

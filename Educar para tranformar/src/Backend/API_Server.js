@@ -25,6 +25,7 @@ const moduloPagos = require('./modulo-pagos');
 const moduloReportes = require('./modulo-reportes');
 const moduloQR = require('./modulo-qr');
 const moduloContacto = require('./modulo-contacto');
+const moduloSalud = require('./modulo-salud');
 const reglas = require('./reglas-negocio');
 const { notificarATodos } = require('./notificaciones');
 
@@ -256,7 +257,7 @@ app.get('/api/tutores/:id/alumnos', async (req, res) => {
  * GET /api/usuarios
  * Lista todos los usuarios registrados con su DNI, rol y nivel académico asociado.
  */
-app.get('/api/usuarios', async (req, res) => {
+app.get('/api/usuarios', moduloMovil.requiereAuth, moduloMovil.soloRoles('ADMIN'), async (req, res) => {
   try {
     const query = `
       SELECT 
@@ -316,12 +317,12 @@ app.get('/api/usuarios', async (req, res) => {
  * y crea su perfil correspondiente (alumno, profesor o tutor).
  * REGLA DE NEGOCIO: Todo alumno debe tener al menos un tutor responsable.
  */
-app.post('/api/usuarios', async (req, res) => {
+app.post('/api/usuarios', moduloMovil.requiereAuth, moduloMovil.soloRoles('ADMIN'), async (req, res) => {
   const { 
     nombre, apellido, dni, password, rol, nivel = 'primaria',
-    edad, genero,
+    edad, genero, email,
     id_curso,
-    id_tutor, tutor_dni, tutor_nombre, tutor_apellido, tutor_telefono 
+    id_tutor, tutor_dni, tutor_nombre, tutor_apellido, tutor_telefono, tutor_email
   } = req.body;
 
   if (!nombre || !apellido || !dni || !password || !rol) {
@@ -347,9 +348,14 @@ app.post('/api/usuarios', async (req, res) => {
   try {
     await client.query('BEGIN');
 
-    // 1. Verificar si ya existe un usuario o registro con ese DNI o email
-    const emailGenerado = `${dni}@novasys.edu.ar`;
-    const checkEmail = await client.query('SELECT id_usuario FROM usuarios WHERE email = $1', [emailGenerado]);
+    // 1. Correo real (para recuperar la contraseña y recibir avisos). Si no se carga, se genera uno interno.
+    const emailReal = String(email || '').trim().toLowerCase();
+    if (emailReal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailReal)) {
+      await client.query('ROLLBACK');
+      return fail(res, 'El correo electrónico no es válido.', 400);
+    }
+    const emailGenerado = emailReal || `${dni}@novasys.edu.ar`;
+    const checkEmail = await client.query('SELECT id_usuario FROM usuarios WHERE LOWER(email) = $1', [emailGenerado]);
     if (checkEmail.rows.length > 0) {
       await client.query('ROLLBACK');
       return fail(res, 'Ya existe una cuenta registrada con ese DNI / correo', 409);
@@ -415,12 +421,22 @@ app.post('/api/usuarios', async (req, res) => {
           finalTutorId = checkTutor.rows[0].id_tutor;
         } else {
           // Crear usuario para el nuevo tutor
-          const emailTutor = `${tutor_dni}@novasys.edu.ar`;
+          const emailTutorReal = String(tutor_email || '').trim().toLowerCase();
+          if (emailTutorReal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTutorReal)) {
+            await client.query('ROLLBACK');
+            return fail(res, 'El correo del tutor no es válido.', 400);
+          }
+          const emailTutor = emailTutorReal || `${tutor_dni}@novasys.edu.ar`;
+          // Nunca se reutiliza ni se cambia el rol de una cuenta existente con ese correo
+          const yaExiste = await client.query('SELECT 1 FROM usuarios WHERE LOWER(email) = $1', [emailTutor]);
+          if (yaExiste.rowCount) {
+            await client.query('ROLLBACK');
+            return fail(res, 'El correo del tutor ya está registrado en otra cuenta.', 409);
+          }
           const passTutorHash = await bcrypt.hash('1234', 10);
           const uTutorRes = await client.query(
             `INSERT INTO usuarios (email, password_hash, rol, nombre, apellido, estado)
              VALUES ($1, $2, 'PADRE', $3, $4, 'ACTIVO')
-             ON CONFLICT (email) DO UPDATE SET rol = 'PADRE'
              RETURNING id_usuario`,
             [emailTutor, passTutorHash, tutor_nombre, tutor_apellido]
           );
@@ -490,7 +506,30 @@ app.post('/api/usuarios', async (req, res) => {
  * DELETE /api/usuarios/:id
  * Elimina un usuario por su ID
  */
-app.delete('/api/usuarios/:id', async (req, res) => {
+/**
+ * PUT /api/usuarios/:id/email { email } (ADMIN)
+ * Carga o corrige el correo real del usuario (necesario para "Recuperar contraseña").
+ * El ingreso por DNI no depende del correo, así que cambiarlo no afecta el login.
+ */
+app.put('/api/usuarios/:id/email', moduloMovil.requiereAuth, moduloMovil.soloRoles('ADMIN'), async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const email = String(req.body?.email || '').trim().toLowerCase();
+  if (!Number.isInteger(id)) return fail(res, 'Usuario inválido', 400);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 120) return fail(res, 'El correo electrónico no es válido.', 400);
+  try {
+    const dup = await db.query('SELECT 1 FROM usuarios WHERE LOWER(email) = $1 AND id_usuario <> $2', [email, id]);
+    if (dup.rowCount) return fail(res, 'Ese correo ya está registrado en otra cuenta.', 409);
+    const r = await db.query('UPDATE usuarios SET email = $1 WHERE id_usuario = $2 RETURNING id_usuario, email', [email, id]);
+    if (!r.rowCount) return fail(res, 'Usuario no encontrado', 404);
+    await reglas.auditar(req, 'CAMBIO_EMAIL_USUARIO', { id_usuario: id });
+    ok(res, r.rows[0]);
+  } catch (error) {
+    console.error('[API PUT /usuarios/:id/email] Error:', error);
+    fail(res, 'No se pudo actualizar el correo', 500);
+  }
+});
+
+app.delete('/api/usuarios/:id', moduloMovil.requiereAuth, moduloMovil.soloRoles('ADMIN'), async (req, res) => {
   const client = await db.getClient();
   try {
     await client.query('BEGIN');
@@ -2102,6 +2141,7 @@ moduloPagos.registrar(app);
 moduloReportes.registrar(app);
 moduloQR.registrar(app);
 moduloContacto.registrar(app);
+moduloSalud.registrar(app);
 
 // ─── 404 CATCH-ALL ──────────────────────────────────────────────────────────
 

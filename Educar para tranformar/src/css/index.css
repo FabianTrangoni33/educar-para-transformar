@@ -337,7 +337,7 @@ body {
 #instalaciones .sport-card.sport-natacion:hover { background-color: rgba(255, 193, 7, 0.08); border-color: rgba(255, 193, 7, 0.3); color: #b76d00; }
 #instalaciones .sport-card.sport-futbol:hover { background-color: rgba(25, 135, 84, 0.08); border-color: rgba(25, 135, 84, 0.3); color: #1f7a58; }
 #instalaciones .sport-card.sport-artes:hover { background-color: rgba(109, 40, 217, 0.08); border-color: rgba(109, 40, 217, 0.3); color: var(--logo-docente); }
-#instalaciones .sport-card.sport-voleibol:hover { background-color: rgba(13, 110, 253, 0.08); border-color: rgba(13, 110, 253, 0.3); color: #0d6efd; }
+#instalaciones .sport-card.sport-voleibol:hover { background-color: rgba(14, 165, 233, 0.08); border-color: rgba(14, 165, 233, 0.3); color: #0ea5e9; }
 #instalaciones .sport-card.sport-danza:hover { background-color: rgba(20, 184, 166, 0.08); border-color: rgba(20, 184, 166, 0.3); color: var(--logo-terciario); }
 #instalaciones .sport-card.sport-basquet:hover { background-color: rgba(249, 115, 22, 0.08); border-color: rgba(249, 115, 22, 0.3); color: var(--logo-acento); }
 #instalaciones .sport-card.sport-ajedrez:hover { background-color: rgba(11, 37, 69, 0.05); border-color: rgba(11, 37, 69, 0.2); color: var(--logo-primario); }
